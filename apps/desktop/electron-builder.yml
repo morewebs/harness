@@ -2,6 +2,9 @@ appId: com.morewebs.harness
 productName: MoreWeb Desktop
 copyright: Copyright © 2026 MoreWeb Harness Contributors
 
+npmRebuild: false
+nodeGypRebuild: false
+
 directories:
   output: dist-installer
   buildResources: build
