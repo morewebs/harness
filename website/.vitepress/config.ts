@@ -229,6 +229,21 @@ const wordmark = readFileSync(resolve(import.meta.dirname, '../public/wordmark.s
  * stay behind a query only Firefox answers.
  */
 const siteStyle = `
+@font-face {
+  font-family: 'Poppins-thin';
+  src: url('/fonts/poppins-100.woff2') format('woff2');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/poppins-100.woff2') format('woff2');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
 .dsh-lockup { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
 .dsh-wordmark { display: block; height: 22px; width: auto; color: var(--vp-c-text-1); }
 .dsh-tag {
@@ -304,6 +319,7 @@ export default withMermaid({
   head: [
     // VitePress leaves head hrefs untouched, so the base belongs here explicitly.
     ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}favicon.svg` }],
+    ['link', { rel: 'preload', href: `${base}fonts/poppins-100.woff2`, as: 'font', type: 'font/woff2', crossorigin: '' }],
     ['style', {}, siteStyle],
     ['script', {}, scrollbarScript],
   ],

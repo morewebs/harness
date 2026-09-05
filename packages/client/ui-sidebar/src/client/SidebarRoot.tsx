@@ -15,13 +15,27 @@
  * scrollbar indirection away while it is elsewhere, so a list the user is not
  * pointing at carries no bar.
  */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import clsx from 'clsx'
 import {
   FishLogo, IconNewChatOutline16, IconPanelLeftOutline16, Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { SidebarRootComponentProps } from './contract/slots.ts'
 import css from './SidebarRoot.module.css'
+
+/** Wrap the leading brand name in Poppins-thin styling. */
+function formatBrandText(text: string): ReactNode {
+  const prefix = 'moreweb'
+  if (text.startsWith(prefix)) {
+    return (
+      <>
+        <span className={css.brandMoreweb}>{prefix}</span>
+        {text.slice(prefix.length)}
+      </>
+    )
+  }
+  return text
+}
 
 /** Wide-content unmount delay; matches the 150ms wide-content fade-out. */
 const COLLAPSE_SETTLE_MS = 150
@@ -154,10 +168,10 @@ export function SidebarRoot({
               <span className={css.brandName}>
                 {renderSlot('sidebar.brand.name', {}, {
                   fallback: buildVersion === undefined
-                    ? <span className={css.fallbackBrandName}>{t('brand.localBuild')}</span>
+                    ? <span className={css.fallbackBrandName}>{formatBrandText(t('brand.localBuild'))}</span>
                     : (
                       <span className={css.localBuildBrand}>
-                        <span className={css.localBuildTitle}>{t('brand.localBuild')}</span>
+                        <span className={css.localBuildTitle}>{formatBrandText(t('brand.localBuild'))}</span>
                         <span className={css.buildVersion}>{buildVersion}</span>
                       </span>
                     ),

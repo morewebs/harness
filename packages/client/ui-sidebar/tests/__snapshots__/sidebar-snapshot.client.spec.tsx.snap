@@ -143,7 +143,12 @@ exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsul
                 <span
                   class="localBuildTitle"
                 >
-                  DSH Local Build
+                  <span
+                    class="brandMoreweb"
+                  >
+                    moreweb
+                  </span>
+                   Local Build
                 </span>
                 <span
                   class="buildVersion"
@@ -273,7 +278,12 @@ exports[`sidebar shell snapshots > renders the expanded column in the default lo
                 <span
                   class="localBuildTitle"
                 >
-                  DSH 本地构建
+                  <span
+                    class="brandMoreweb"
+                  >
+                    moreweb
+                  </span>
+                   本地构建
                 </span>
                 <span
                   class="buildVersion"

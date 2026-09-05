@@ -159,6 +159,12 @@
   white-space: nowrap;
 }
 
+.brandMoreweb {
+  font-family: 'Poppins-thin', 'Poppins', sans-serif;
+  font-weight: 100;
+  letter-spacing: -0.5px;
+}
+
 .localBuildBrand {
   flex: none;
   display: inline-flex;
