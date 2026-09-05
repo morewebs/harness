@@ -1,0 +1,25 @@
+{
+  "name": "@deepseek-ai/dsh-desktop",
+  "description": "MoreWeb Harness Desktop application: native Electron shell for the web GUI and local agent service",
+  "version": "0.1.3-alpha.1",
+  "author": "DeepSeek Harness Contributors",
+  "private": true,
+  "type": "module",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.js",
+    "dev": "npm run build && electron .",
+    "pack": "npm run build && electron-builder --dir",
+    "build:dist": "npm run build && electron-builder --win --x64"
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh": "workspace:^",
+    "@deepseek-ai/dsh-web-frontend": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,47 @@
+appId: com.morewebs.harness
+productName: MoreWeb Desktop
+copyright: Copyright © 2026 MoreWeb Harness Contributors
+
+directories:
+  output: dist-installer
+  buildResources: build
+
+files:
+  - dist/**/*
+  - build/icon.png
+  - build/icon.ico
+  - package.json
+
+extraResources:
+  - from: ../web/dist
+    to: web-dist
+    filter:
+      - '**/*'
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: msi
+      arch:
+        - x64
+  icon: build/icon.ico
+  artifactName: ${productName}-Setup-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: MoreWeb Desktop
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  uninstallDisplayName: MoreWeb Desktop
+  runAfterFinish: true
+
+msi:
+  oneClick: false
+  perMachine: true
+  runAfterFinish: false
