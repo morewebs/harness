@@ -103,18 +103,18 @@ export function buildApplicationMenu(
       role: 'help' as const,
       submenu: [
         {
-          label: 'MoreWeb Harness Documentation',
+          label: 'moreweb harness Documentation',
           click: () => {
             void shell.openExternal('https://github.com/deepseek-ai/deepseek-harness')
           },
         },
         { type: 'separator' as const },
         {
-          label: 'About MoreWeb Desktop',
+          label: 'About moreweb Desktop',
           click: (menuItem, browserWindow) => {
             const window = browserWindow as BrowserWindow | undefined
             const message = [
-              `MoreWeb Desktop version: ${app.getVersion()}`,
+              `moreweb Desktop version: ${app.getVersion()}`,
               `Electron: ${process.versions.electron}`,
               `Node.js: ${process.versions.node}`,
               `Chromium: ${process.versions.chrome}`,
@@ -124,8 +124,8 @@ export function buildApplicationMenu(
             if (window) {
               void dialog.showMessageBox(window, {
                 type: 'info',
-                title: 'About MoreWeb Desktop',
-                message: 'MoreWeb Desktop',
+                title: 'About moreweb Desktop',
+                message: 'moreweb Desktop',
                 detail: message,
                 buttons: ['OK'],
               })

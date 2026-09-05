@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { join } from 'node:path'
 import { DSH_WEB_URL_REGEX, ServerManager } from '../src/main/server-manager.ts'
+
+const mockExistingPaths = new Set<string>()
 
 // Mock electron app
 vi.mock('electron', () => ({
@@ -14,7 +17,9 @@ vi.mock('node:fs', async (importOriginal) => {
   return {
     ...actual,
     existsSync: (path: string) =>
-      (typeof path === 'string' && path.includes('custom\\dsh.exe')) || actual.existsSync(path),
+      mockExistingPaths.has(path) ||
+      (typeof path === 'string' && path.includes('custom\\dsh.exe')) ||
+      actual.existsSync(path),
   }
 })
 
@@ -23,10 +28,12 @@ describe('ServerManager & URL Extraction', () => {
 
   beforeEach(() => {
     process.env = { ...originalEnv }
+    mockExistingPaths.clear()
   })
 
   afterEach(() => {
     process.env = originalEnv
+    mockExistingPaths.clear()
     vi.restoreAllMocks()
   })
 
@@ -75,5 +82,33 @@ describe('ServerManager & URL Extraction', () => {
     const manager = new ServerManager()
     const entry = manager.resolveBackendEntry()
     expect(entry.command).toBe('C:\\custom\\dsh.exe')
+  })
+
+  it('resolves bundled node and packaged cli when both are present', () => {
+    ;(process as { resourcesPath?: string }).resourcesPath = 'C:\\mock-resources'
+    const packagedCli = join(process.cwd(), 'node_modules/@deepseek-ai/dsh/lib/bin.js')
+    const bundledNode = join(
+      'C:\\mock-resources',
+      'bin',
+      process.platform === 'win32' ? 'node.exe' : 'node',
+    )
+    mockExistingPaths.add(packagedCli)
+    mockExistingPaths.add(bundledNode)
+
+    const manager = new ServerManager()
+    const entry = manager.resolveBackendEntry()
+    expect(entry.command).toBe(bundledNode)
+    expect(entry.args).toEqual([packagedCli])
+  })
+
+  it('resolves electron run as node when packaged cli is present without bundled node', () => {
+    const packagedCli = join(process.cwd(), 'node_modules/@deepseek-ai/dsh/lib/bin.js')
+    mockExistingPaths.add(packagedCli)
+
+    const manager = new ServerManager()
+    const entry = manager.resolveBackendEntry()
+    expect(entry.command).toBe(process.execPath)
+    expect(entry.args).toEqual([packagedCli])
+    expect(entry.env.ELECTRON_RUN_AS_NODE).toBe('1')
   })
 })

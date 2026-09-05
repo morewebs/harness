@@ -1,5 +1,5 @@
 /**
- * Electron Main Process for MoreWeb Desktop.
+ * Electron Main Process for moreweb Desktop.
  */
 
 import { app, BrowserWindow, shell, ipcMain, Menu } from 'electron'
@@ -27,6 +27,19 @@ function getLoadingHtmlPath(): string {
     if (existsSync(candidate)) return candidate
   }
   return join(__dirname, '../renderer/loading.html')
+}
+
+function getPreloadScriptPath(): string {
+  const candidates = [
+    join(__dirname, '../preload/index.cjs'),
+    join(__dirname, '../../src/preload/index.cjs'),
+    join(app.getAppPath(), 'dist/preload/index.cjs'),
+    join(app.getAppPath(), 'src/preload/index.cjs'),
+  ]
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate
+  }
+  return join(__dirname, '../preload/index.cjs')
 }
 
 // Single instance lock
@@ -70,11 +83,11 @@ function createWindow(): void {
     height: 800,
     minWidth: 800,
     minHeight: 600,
-    title: 'DSH Desktop',
+    title: 'moreweb Desktop',
     show: false,
     backgroundColor: '#0f172a',
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: getPreloadScriptPath(),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,

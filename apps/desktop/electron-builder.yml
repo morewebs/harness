@@ -1,6 +1,8 @@
 appId: com.morewebs.harness
-productName: MoreWeb Desktop
-copyright: Copyright © 2026 MoreWeb Harness Contributors
+productName: moreweb Desktop
+copyright: Copyright © 2026 moreweb
+
+asar: false
 
 npmRebuild: false
 nodeGypRebuild: false
@@ -21,6 +23,10 @@ files:
   - package.json
 
 extraResources:
+  - from: build/bin
+    to: bin
+    filter:
+      - '**/*'
   - from: ../web/dist
     to: web-dist
     filter:
@@ -43,10 +49,10 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: always
   createStartMenuShortcut: true
-  shortcutName: MoreWeb Desktop
+  shortcutName: moreweb Desktop
   installerIcon: build/icon.ico
   uninstallerIcon: build/icon.ico
-  uninstallDisplayName: MoreWeb Desktop
+  uninstallDisplayName: moreweb Desktop
   runAfterFinish: true
 
 msi:

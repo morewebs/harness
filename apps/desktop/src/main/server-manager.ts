@@ -6,6 +6,7 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 import { existsSync, mkdirSync, createWriteStream, type WriteStream } from 'node:fs'
 import { join, resolve, dirname } from 'node:path'
+import { homedir } from 'node:os'
 import { app } from 'electron'
 
 /** Regular expression to extract the authenticated token URL printed by `dsh web`. */
@@ -79,9 +80,10 @@ export class ServerManager {
       return { command: bin, args: [], env: { ...process.env } }
     }
 
-    // 2. Packaged standalone binary in resources
+    // 2. Packaged standalone binary in resources (e.g. resources/bin/dsh.exe)
+    const resources = process.resourcesPath || join(app.getAppPath(), 'resources')
     const packagedExe = join(
-      process.resourcesPath,
+      resources,
       'bin',
       process.platform === 'win32' ? 'dsh.exe' : 'dsh',
     )
@@ -89,7 +91,43 @@ export class ServerManager {
       return { command: packagedExe, args: [], env: { ...process.env } }
     }
 
-    // 3. Search up the directory tree for monorepo development checkout
+    // 3. Packaged CLI entry point in resources/app or app.getAppPath()
+    const candidateCliPaths = [
+      join(app.getAppPath(), 'node_modules/@deepseek-ai/dsh/lib/bin.js'),
+      join(resources, 'app/node_modules/@deepseek-ai/dsh/lib/bin.js'),
+      join(resources, 'node_modules/@deepseek-ai/dsh/lib/bin.js'),
+    ]
+    let packagedCli: string | null = null
+    for (const p of candidateCliPaths) {
+      if (existsSync(p)) {
+        packagedCli = p
+        break
+      }
+    }
+
+    // Bundled Node runtime binary (e.g. resources/bin/node.exe)
+    const bundledNode = join(
+      resources,
+      'bin',
+      process.platform === 'win32' ? 'node.exe' : 'node',
+    )
+
+    if (packagedCli) {
+      if (existsSync(bundledNode)) {
+        return {
+          command: bundledNode,
+          args: [packagedCli],
+          env: { ...process.env },
+        }
+      }
+      return {
+        command: process.execPath,
+        args: [packagedCli],
+        env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
+      }
+    }
+
+    // 4. Search up the directory tree for monorepo development checkout
     let dir = app.getAppPath()
     for (let i = 0; i < 6; i++) {
       const builtBin = resolve(dir, 'apps/cli/lib/bin.js')
@@ -115,7 +153,15 @@ export class ServerManager {
       dir = parent
     }
 
-    // 4. Fallback to system dsh binary in PATH
+    // 5. Fallback: bundled node if present, otherwise system dsh
+    if (existsSync(bundledNode)) {
+      return {
+        command: bundledNode,
+        args: [],
+        env: { ...process.env },
+      }
+    }
+
     return {
       command: process.platform === 'win32' ? 'dsh.cmd' : 'dsh',
       args: [],
@@ -156,7 +202,9 @@ export class ServerManager {
       let stderrBuffer = ''
 
       try {
+        const workspaceCwd = process.env.DSH_WORKSPACE || homedir()
         const child = spawn(command, spawnArgs, {
+          cwd: workspaceCwd,
           env: {
             ...env,
             // Ensure CI telemetry disabled flag is respected if set

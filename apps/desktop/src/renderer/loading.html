@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MoreWeb Desktop</title>
+  <title>moreweb Desktop</title>
   <link rel="stylesheet" href="./loading.css">
 </head>
 <body>
@@ -15,8 +15,8 @@
       </svg>
     </div>
 
-    <h1>MoreWeb Desktop</h1>
-    <div id="statusMessage" class="status-message">Initializing MoreWeb Harness backend...</div>
+    <h1>moreweb Desktop</h1>
+    <div id="statusMessage" class="status-message">Initializing moreweb harness backend...</div>
 
     <div id="spinner" class="spinner"></div>
 
@@ -64,6 +64,11 @@
       logsBtn.addEventListener('click', () => {
         window.desktopAPI.openLogFolder();
       });
+    } else {
+      spinner.style.display = 'none';
+      errorView.style.display = 'flex';
+      statusMessage.textContent = 'Desktop API initialization error';
+      errorDetails.textContent = 'Preload bridge is unavailable. Please restart the application or reinstall.';
     }
   </script>
 </body>
