@@ -5,6 +5,11 @@ copyright: Copyright © 2026 MoreWeb Harness Contributors
 npmRebuild: false
 nodeGypRebuild: false
 
+publish:
+  provider: github
+  owner: morewebs
+  repo: harness
+
 directories:
   output: dist-installer
   buildResources: build
