@@ -10,7 +10,7 @@
  * Loader fixtures resolve from their package manifest.
  */
 
-import { globSync, readFileSync } from 'node:fs'
+import { existsSync, globSync, readFileSync } from 'node:fs'
 import { dirname, relative, resolve } from 'node:path'
 import { Script } from 'node:vm'
 import ts from 'typescript'
@@ -61,7 +61,16 @@ if (import.meta.main) {
   const files = cordisConfigFiles(root)
 
   for (const file of files) {
-    const document = loadCordisYaml(readFileSync(resolve(root, file), 'utf8'))
+    const absPath = resolve(root, file)
+    let raw = readFileSync(absPath, 'utf8')
+    const trimmed = raw.trim()
+    if (!trimmed.includes('\n') && (trimmed.endsWith('.yml') || trimmed.endsWith('.yaml'))) {
+      const candidate = resolve(dirname(absPath), trimmed)
+      if (existsSync(candidate)) {
+        raw = readFileSync(candidate, 'utf8')
+      }
+    }
+    const document = loadCordisYaml(raw)
     if (!isUnknownArray(document)) {
       errors.push(`${file}: root must be a Loader entry array`)
       continue

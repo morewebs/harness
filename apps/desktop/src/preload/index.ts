@@ -1,5 +1,5 @@
 /**
- * Electron Preload script for DSH Desktop.
+ * Electron Preload script for moreweb Desktop.
  * Exposes safe desktop-specific primitives to the window.
  */
 

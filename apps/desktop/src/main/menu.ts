@@ -1,5 +1,5 @@
 /**
- * Application menu builder for DSH Desktop.
+ * Application menu builder for moreweb Desktop.
  */
 
 import { Menu, MenuItemConstructorOptions, app, shell, dialog, BrowserWindow } from 'electron'
@@ -45,7 +45,7 @@ export function buildApplicationMenu(
         {
           label: 'Open &Logs Directory',
           click: () => {
-            void shell.showItemInFolder(serverManager.getLogFilePath())
+            shell.showItemInFolder(serverManager.getLogFilePath())
           },
         },
         { type: 'separator' },

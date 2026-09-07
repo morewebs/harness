@@ -63,12 +63,12 @@ async function startBackendAndLoad(): Promise<void> {
 
   try {
     const url = await serverManager.start()
-    if (mainWindow && !mainWindow.isDestroyed()) {
+    if (!mainWindow.isDestroyed()) {
       await mainWindow.loadURL(url)
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    if (mainWindow && !mainWindow.isDestroyed()) {
+    if (!mainWindow.isDestroyed()) {
       mainWindow.webContents.send('dsh:server-status', {
         state: 'error',
         message,
@@ -153,7 +153,7 @@ function setupIpc(): void {
 }
 
 // App lifecycle
-app.whenReady().then(async () => {
+void app.whenReady().then(async () => {
   serverManager = new ServerManager()
 
   serverManager.onStatus((status) => {

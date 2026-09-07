@@ -1,6 +1,6 @@
 /**
- * Server manager for DSH Desktop.
- * Launches, monitors, and stops the DeepSeek Harness web backend.
+ * Server manager for moreweb Desktop.
+ * Launches, monitors, and stops the moreweb harness web backend.
  */
 
 import { spawn, type ChildProcess } from 'node:child_process'
@@ -216,7 +216,7 @@ export class ServerManager {
 
         this.child = child
 
-        child.stdout?.on('data', (chunk: Buffer | string) => {
+        child.stdout.on('data', (chunk: Buffer | string) => {
           const text = chunk.toString('utf8')
           this.log(`[STDOUT] ${text}`)
 
@@ -232,7 +232,7 @@ export class ServerManager {
           }
         })
 
-        child.stderr?.on('data', (chunk: Buffer | string) => {
+        child.stderr.on('data', (chunk: Buffer | string) => {
           const text = chunk.toString('utf8')
           stderrBuffer += text
           this.log(`[STDERR] ${text}`)
@@ -243,7 +243,7 @@ export class ServerManager {
           this.notify({ state: 'error', message: err.message })
           if (!resolved) {
             resolved = true
-            reject(new Error(`Failed to start DeepSeek Harness backend: ${err.message}`))
+            reject(new Error(`Failed to start moreweb harness backend: ${err.message}`))
           }
         })
 
@@ -260,9 +260,9 @@ export class ServerManager {
           }
         })
       } catch (err) {
-        const message = err instanceof Error ? err.message : String(err)
-        this.notify({ state: 'error', message })
-        reject(err)
+        const errorObj = err instanceof Error ? err : new Error(String(err))
+        this.notify({ state: 'error', message: errorObj.message })
+        reject(errorObj)
       }
     })
   }

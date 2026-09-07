@@ -3,6 +3,7 @@
   "description": "moreweb harness Desktop application: native Electron shell for the web GUI and local agent service",
   "version": "0.1.3-alpha.1",
   "author": "moreweb",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/morewebs/harness.git",

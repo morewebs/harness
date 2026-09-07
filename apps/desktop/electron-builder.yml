@@ -2,6 +2,8 @@ appId: com.morewebs.harness
 productName: moreweb Desktop
 copyright: Copyright © 2026 moreweb
 
+afterPack: scripts/after-pack.cjs
+
 asar: false
 
 npmRebuild: false
@@ -21,6 +23,10 @@ files:
   - build/icon.png
   - build/icon.ico
   - package.json
+  - '!**/node_modules/@deepseek-ai/*/node_modules/**'
+  - '!**/node_modules/**/*.map'
+  - '!**/node_modules/**/*.ts'
+  - '!**/node_modules/**/*.md'
 
 extraResources:
   - from: build/bin

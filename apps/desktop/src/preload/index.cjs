@@ -1,5 +1,5 @@
 /**
- * CommonJS Preload script for DSH Desktop.
+ * CommonJS Preload script for moreweb Desktop.
  * Must be CommonJS to avoid Node ESM loader protocol restrictions with electron builtin.
  */
 

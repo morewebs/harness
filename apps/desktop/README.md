@@ -1,10 +1,10 @@
-# DSH Desktop
+# moreweb Desktop
 
-DeepSeek Harness Desktop application: native Electron shell for the web GUI and local agent service.
+moreweb harness Desktop application: native Electron shell for the web GUI and local agent service.
 
 ## Overview
 
-DSH Desktop wraps the DeepSeek Harness interactive web interface and local agent runtime into a native desktop application for Windows. It provides:
+moreweb Desktop wraps the moreweb harness interactive web interface and local agent runtime into a native desktop application for Windows. It provides:
 
 - **Native Windows Desktop Window**: Clean desktop container with standard menus, developer tools, and navigation protection.
 - **Managed Backend Subprocess**: Automatically locates, starts, and supervises the local `dsh web` service on an ephemeral loopback port (`--port 0 --no-open`).
@@ -17,7 +17,7 @@ DSH Desktop wraps the DeepSeek Harness interactive web interface and local agent
 
 ```
 ┌───────────────────────────────────────────────────────────┐
-│                      DSH Desktop                          │
+│                   moreweb Desktop                         │
 │                                                           │
 │  ┌───────────────────────┐      ┌──────────────────────┐  │
 │  │     Main Process      │      │    BrowserWindow     │  │
@@ -28,7 +28,7 @@ DSH Desktop wraps the DeepSeek Harness interactive web interface and local agent
 │              │                                            │
 │              ▼ spawns / supervises                        │
 │  ┌─────────────────────────────────────────────────────┐  │
-│  │  DSH Web Backend Subprocess                         │  │
+│  │  moreweb Web Backend Subprocess                     │  │
 │  │  - Cordis plugin container                          │  │
 │  │  - HTTP API & WebSocket multiplexer                 │  │
 │  │  - Agent loops, tools, presets, storage             │  │
@@ -64,8 +64,8 @@ pnpm --filter @deepseek-ai/dsh-desktop run build:dist
 ```
 
 Installers will be generated in `apps/desktop/dist-installer/`:
-- `DSH Desktop-Setup-<version>-x64.exe` (NSIS setup with custom directory, desktop shortcut, and uninstaller)
-- `DSH Desktop-Setup-<version>-x64.msi` (Windows Installer package for enterprise / GPO deployment)
+- `moreweb Desktop-Setup-<version>-x64.exe` (NSIS setup with custom directory, desktop shortcut, and uninstaller)
+- `moreweb Desktop-Setup-<version>-x64.msi` (Windows Installer package for enterprise / GPO deployment)
 
 To test the unpacked application without creating an installer:
 ```sh

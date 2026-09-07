@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Poppins-thin';
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url('./fonts/poppins-100.woff2') format('woff2');
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -80,6 +88,12 @@ h1 {
   letter-spacing: -0.02em;
   margin-bottom: 8px;
   color: #ffffff;
+}
+
+.brand-moreweb {
+  font-family: 'Poppins-thin', 'Poppins', sans-serif;
+  font-weight: 100;
+  letter-spacing: -0.5px;
 }
 
 .status-message {
