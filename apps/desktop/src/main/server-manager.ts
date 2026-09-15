@@ -72,15 +72,42 @@ export class ServerManager {
       const bin = process.env.DSH_BIN_PATH
       if (bin.endsWith('.js') || bin.endsWith('.ts')) {
         return {
-          command: process.execPath,
+          command: 'node',
           args: [bin],
-          env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
+          env: { ...process.env },
         }
       }
       return { command: bin, args: [], env: { ...process.env } }
     }
 
-    // 2. Packaged standalone binary in resources (e.g. resources/bin/dsh.exe)
+    // 2. In development (unpackaged), prioritize monorepo checkout
+    if (!app.isPackaged) {
+      let dir = app.getAppPath()
+      for (let i = 0; i < 6; i++) {
+        const builtBin = resolve(dir, 'apps/cli/lib/bin.js')
+        if (existsSync(builtBin)) {
+          return {
+            command: 'node',
+            args: [builtBin],
+            env: { ...process.env },
+          }
+        }
+
+        const sourceBin = resolve(dir, 'apps/cli/src/bin.ts')
+        if (existsSync(sourceBin)) {
+          return {
+            command: 'node',
+            args: ['--import', 'tsx/esm', sourceBin],
+            env: { ...process.env },
+          }
+        }
+        const parent = dirname(dir)
+        if (parent === dir) break
+        dir = parent
+      }
+    }
+
+    // 3. Packaged standalone binary in resources (e.g. resources/bin/dsh.exe)
     const resources = process.resourcesPath || join(app.getAppPath(), 'resources')
     const packagedExe = join(
       resources,
@@ -91,11 +118,24 @@ export class ServerManager {
       return { command: packagedExe, args: [], env: { ...process.env } }
     }
 
-    // 3. Packaged CLI entry point in resources/app or app.getAppPath()
+    // Bundled Node runtime binary (e.g. resources/bin/node.exe or app/build/bin/node.exe)
+    const candidateBundledNodes = [
+      join(resources, 'bin', process.platform === 'win32' ? 'node.exe' : 'node'),
+      join(app.getAppPath(), 'build', 'bin', process.platform === 'win32' ? 'node.exe' : 'node'),
+    ]
+    let bundledNode: string | null = null
+    for (const b of candidateBundledNodes) {
+      if (existsSync(b)) {
+        bundledNode = b
+        break
+      }
+    }
+
+    // 4. Packaged CLI entry point in resources/app or app.getAppPath()
     const candidateCliPaths = [
-      join(app.getAppPath(), 'node_modules/@deepseek-ai/dsh/lib/bin.js'),
       join(resources, 'app/node_modules/@deepseek-ai/dsh/lib/bin.js'),
       join(resources, 'node_modules/@deepseek-ai/dsh/lib/bin.js'),
+      join(app.getAppPath(), 'node_modules/@deepseek-ai/dsh/lib/bin.js'),
     ]
     let packagedCli: string | null = null
     for (const p of candidateCliPaths) {
@@ -105,43 +145,45 @@ export class ServerManager {
       }
     }
 
-    // Bundled Node runtime binary (e.g. resources/bin/node.exe)
-    const bundledNode = join(
-      resources,
-      'bin',
-      process.platform === 'win32' ? 'node.exe' : 'node',
-    )
-
     if (packagedCli) {
-      if (existsSync(bundledNode)) {
+      if (bundledNode) {
         return {
           command: bundledNode,
           args: [packagedCli],
           env: { ...process.env },
         }
       }
+      // DSH requires Node >= 22 (Cordis internal module loader requires Node 22+).
+      // Electron 34 bundles Node 20, so ELECTRON_RUN_AS_NODE cannot run DSH.
+      const electronNodeMajor = parseInt(process.versions.node.split('.')[0] || '0', 10)
+      if (electronNodeMajor >= 22) {
+        return {
+          command: process.execPath,
+          args: [packagedCli],
+          env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
+        }
+      }
       return {
-        command: process.execPath,
+        command: 'node',
         args: [packagedCli],
-        env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
+        env: { ...process.env },
       }
     }
 
-    // 4. Search up the directory tree for monorepo development checkout
+    // 5. Fallback: Search up the directory tree for monorepo development checkout
     let dir = app.getAppPath()
     for (let i = 0; i < 6; i++) {
       const builtBin = resolve(dir, 'apps/cli/lib/bin.js')
       if (existsSync(builtBin)) {
         return {
-          command: process.execPath,
+          command: 'node',
           args: [builtBin],
-          env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
+          env: { ...process.env },
         }
       }
 
       const sourceBin = resolve(dir, 'apps/cli/src/bin.ts')
       if (existsSync(sourceBin)) {
-        // Source execution via tsx if available or node with tsx
         return {
           command: 'node',
           args: ['--import', 'tsx/esm', sourceBin],
@@ -153,8 +195,8 @@ export class ServerManager {
       dir = parent
     }
 
-    // 5. Fallback: bundled node if present, otherwise system dsh
-    if (existsSync(bundledNode)) {
+    // 6. Fallback: bundled node if present, otherwise system dsh
+    if (bundledNode) {
       return {
         command: bundledNode,
         args: [],

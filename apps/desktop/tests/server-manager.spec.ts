@@ -7,6 +7,7 @@ const mockExistingPaths = new Set<string>()
 // Mock electron app
 vi.mock('electron', () => ({
   app: {
+    isPackaged: true,
     getPath: vi.fn(() => './tmp-test-logs'),
     getAppPath: vi.fn(() => process.cwd()),
   },

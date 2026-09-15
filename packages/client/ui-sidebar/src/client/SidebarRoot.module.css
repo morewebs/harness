@@ -93,8 +93,8 @@
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  height: 60px;
-  padding: 8px 0 8px 4px;
+  height: 44px;
+  padding: 4px 0 4px 4px;
   margin-bottom: 8px;
   box-sizing: border-box;
   overflow: hidden;
@@ -106,6 +106,46 @@
   margin-bottom: 12px;
   justify-content: flex-start;
 }
+
+.brandTitleWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.brandChevron {
+  flex: none;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.headerTrailingActions {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.headerActionButton {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--dsw-alias-label-secondary);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.headerActionButton:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-primary);
+}
+
 
 /* Brand group (figma I133:7632): the full wordmark rides the text ink
    (figma flows: the main-screen instance is black; blue is brand
@@ -139,6 +179,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.brandMark:empty,
+.brandMark:has(> [data-slot]:empty) {
+  display: none;
 }
 
 .brandName {
@@ -207,10 +252,13 @@
   height: 36px;
 }
 
-/* Rail logo swap: collapsed, the toggle rests as the whale mark (brand ink,
-   no hover circle) and hovering reveals the panel icon — the expand
-   affordance (figma sidebar-hover flow). Expanded it is a plain panel icon. */
+/* Rail logo swap: collapsed, the toggle rests as the brand mark (if present)
+   or the panel icon; hovering reveals the panel icon. Expanded it is a plain panel icon. */
 .collapsed .toggle .panelIcon {
+  display: inline;
+}
+
+.collapsed .toggle:has(.railMark:not(:empty)) .panelIcon {
   display: none;
 }
 
@@ -226,6 +274,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.railMark:empty,
+.railMark:has(> [data-slot]:empty) {
+  display: none;
 }
 
 /* Rail icons ride the primary ink (figma rail spec); expanded keeps the
@@ -277,6 +330,82 @@
   background: var(--dsw-alias-button-floating-hover);
 }
 
+.navCluster {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.navClusterCollapsed {
+  margin-bottom: 0;
+}
+
+.codexNavItem {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+  margin: 0;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  font-size: 13.5px;
+  font-weight: 400;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background-color 120ms ease;
+}
+
+.codexNavItem:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.newSession.codexNavItem {
+  height: 32px;
+  padding: 0 8px;
+  margin: 0;
+  border: none;
+  background: transparent;
+  justify-content: space-between;
+  border-radius: 6px;
+}
+
+.newSession.codexNavItem:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.navLeading {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.navItemLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+}
+
+.navPlusIcon {
+  flex: none;
+  color: var(--dsw-alias-label-secondary);
+  opacity: 0.7;
+}
+
+.codexNavItem:hover .navPlusIcon {
+  opacity: 1;
+}
+
 .collapsed .newSession {
   align-self: flex-start;
   width: 36px;
@@ -291,6 +420,7 @@
 .collapsed .newSession:hover {
   background: var(--dsw-alias-interactive-bg-hover);
 }
+
 
 .newSessionLabel {
   max-width: 200px;

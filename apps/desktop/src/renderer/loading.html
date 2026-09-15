@@ -4,75 +4,435 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>moreweb Desktop</title>
+  <link rel="preload" href="./fonts/poppins-100.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./loading.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 100;
+      font-display: swap;
+      src: url('./fonts/poppins-100.woff2') format('woff2');
+    }
+
+    body {
+      background-color: #000000;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Splash Screen Container — also the loading page */
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000000;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(1.5rem, 4vh, 3rem);
+    }
+
+    /* Word Grid Layout */
+    .splash-screen .word {
+      color: #FFFFFF;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 100;
+      font-size: clamp(8rem, 15vw, 10rem);
+      display: grid;
+      grid-template-columns: auto auto;
+      justify-items: center;
+      line-height: 0.8;
+      gap: 0.15em;
+      text-shadow: 0 0 30px #bf00ff;
+      direction: ltr;
+    }
+
+    .splash-screen .word span {
+      opacity: 0;
+      position: relative;
+    }
+
+    /* Staggered Letter Animations */
+    .splash-screen .word span:nth-child(1) { animation: letterAppear 0.3s ease-out 0.0s forwards; }
+    .splash-screen .word span:nth-child(2) { animation: letterAppear 0.3s ease-out 0.1s forwards; }
+    .splash-screen .word span:nth-child(3) { animation: letterAppear 0.3s ease-out 0.2s forwards; }
+    .splash-screen .word span:nth-child(4) { animation: letterAppear 0.3s ease-out 0.3s forwards; }
+
+    @keyframes letterAppear {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Loading status area */
+    .status {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: rgba(255, 255, 255, 0.55);
+      text-align: center;
+      min-height: 18px;
+      max-width: 80vw;
+      opacity: 0;
+      animation: statusAppear 0.4s ease-out 0.5s forwards;
+    }
+
+    .status:empty {
+      display: none;
+    }
+
+    @keyframes statusAppear {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Thin progress bar instead of a spinner, to match the minimal word mark */
+    .progress {
+      position: relative;
+      width: clamp(120px, 18vw, 220px);
+      height: 1px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      opacity: 0;
+      animation: statusAppear 0.4s ease-out 0.6s forwards;
+    }
+
+    .progress::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -40%;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, #bf00ff, transparent);
+      animation: slide 1.4s ease-in-out infinite;
+    }
+
+    @keyframes slide {
+      from { left: -40%; }
+      to   { left: 100%; }
+    }
+
+    /* Error view */
+    .error-view {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      max-width: min(480px, 86vw);
+      text-align: center;
+    }
+
+    .error-view.visible {
+      display: flex;
+      animation: statusAppear 0.3s ease-out forwards;
+    }
+
+    .error-badge {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ff7ab8;
+      text-shadow: 0 0 18px rgba(255, 0, 110, 0.45);
+    }
+
+    .error-details {
+      font-size: 12px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.45);
+      word-break: break-word;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      padding: 8px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: transparent;
+      color: #FFFFFF;
+      border: 1px solid rgba(191, 0, 255, 0.6);
+      box-shadow: 0 0 18px rgba(191, 0, 255, 0.25);
+    }
+
+    .btn-primary:hover {
+      border-color: #bf00ff;
+      box-shadow: 0 0 26px rgba(191, 0, 255, 0.45);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-secondary:hover {
+      color: #FFFFFF;
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    /* Exit animation — fired when the backend reports ready, then main process navigates */
+    .splash-screen.leaving .word {
+      animation: fadeWordOut 0.35s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+    }
+
+    .splash-screen.leaving .status,
+    .splash-screen.leaving .progress {
+      animation: fadeWordOut 0.3s ease-in forwards;
+    }
+
+    @keyframes fadeWordOut {
+      from {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+      }
+      to {
+        opacity: 0;
+        transform: scale(1.1);
+        filter: blur(10px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .splash-screen .word span,
+      .status,
+      .progress {
+        animation-duration: 0.01s;
+        animation-delay: 0s;
+      }
+      .progress::after {
+        animation: none;
+        left: 0;
+        width: 100%;
+      }
+    }
+    /* Top window controls bar for frameless desktop window */
+    .window-titlebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      z-index: 100000;
+      -webkit-app-region: drag;
+      app-region: drag;
+      user-select: none;
+    }
+
+    .window-drag-region {
+      flex: 1;
+      height: 100%;
+      -webkit-app-region: drag;
+      app-region: drag;
+    }
+
+    .window-controls {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      -webkit-app-region: no-drag;
+      app-region: no-drag;
+      flex: none;
+    }
+
+    .control-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 100%;
+      border: none;
+      background: transparent;
+      color: #cccccc;
+      cursor: pointer;
+      transition: background-color 80ms ease, color 80ms ease;
+      -webkit-app-region: no-drag;
+      padding: 0;
+    }
+
+    .control-btn:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+
+    .close-btn:hover {
+      background-color: #e81123 !important;
+      color: #ffffff !important;
+    }
+
+    .close-btn:active {
+      background-color: #c40e1d !important;
+      color: #ffffff !important;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="logo-wrapper">
-      <div class="pulse-ring"></div>
-      <svg class="logo" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M48.8354 10.0479C48.3232 9.79199 48.1025 10.2798 47.8032 10.5278C47.7007 10.6079 47.6143 10.7119 47.5273 10.8076C46.7793 11.624 45.9048 12.1597 44.7622 12.0957C43.0923 12 41.666 12.5356 40.4058 13.8398C40.1377 12.2319 39.2476 11.272 37.8926 10.6558C37.1836 10.3359 36.4668 10.0156 35.9702 9.31982C35.6235 8.82373 35.5293 8.27197 35.356 7.72754C35.2456 7.3999 35.1353 7.06396 34.7651 7.00781C34.3633 6.94385 34.2056 7.2876 34.0479 7.57568C33.418 8.75195 33.1733 10.0479 33.1973 11.3599C33.2524 14.312 34.4736 16.6641 36.8999 18.3359C37.1758 18.5278 37.2466 18.7197 37.1597 19C36.9946 19.5757 36.7974 20.1357 36.624 20.7119C36.5137 21.0801 36.3486 21.1597 35.9624 21C34.6309 20.4321 33.481 19.5918 32.4644 18.5757C30.7393 16.8721 29.1792 14.9917 27.2334 13.52C26.7764 13.1758 26.3193 12.856 25.8467 12.5518C23.8618 10.584 26.1069 8.96777 26.627 8.77588C27.1704 8.57568 26.8159 7.8877 25.0591 7.896C23.3022 7.90381 21.6953 8.50391 19.647 9.30371C19.3477 9.42383 19.0322 9.51172 18.7095 9.58398C16.8501 9.22363 14.9199 9.14355 12.9033 9.37598C9.10596 9.80762 6.07275 11.6396 3.84326 14.7681C1.16455 18.5278 0.53418 22.7998 1.30664 27.2559C2.11768 31.9521 4.46582 35.8398 8.07373 38.8799C11.8159 42.0322 16.1255 43.5762 21.041 43.2803C24.0269 43.104 27.3516 42.6963 31.1016 39.4561C32.0469 39.936 33.0396 40.1279 34.686 40.272C35.9546 40.3921 37.1758 40.208 38.1211 40.0078C39.6021 39.688 39.4995 38.2881 38.9639 38.0322C34.623 35.9678 35.5762 36.8081 34.71 36.1279C36.9155 33.4639 40.2402 30.6958 41.54 21.728C41.6426 21.0161 41.5557 20.5679 41.54 19.9917C41.5322 19.6396 41.6108 19.5039 42.0049 19.4639C43.0923 19.3359 44.1479 19.0317 45.1167 18.4878C47.9292 16.9199 49.064 14.3438 49.3315 11.2559C49.3711 10.7837 49.3237 10.2959 48.8354 10.0479Z" fill="#4D6BFE"/>
+
+<div class="window-titlebar" id="windowTitlebar">
+  <div class="window-drag-region" id="dragRegion"></div>
+  <div class="window-controls" aria-label="Window Controls">
+    <button type="button" class="control-btn" id="minBtn" title="Minimize" aria-label="Minimize">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+        <line x1="1" y1="5" x2="9" y2="5" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
       </svg>
-    </div>
+    </button>
+    <button type="button" class="control-btn" id="maxBtn" title="Maximize" aria-label="Maximize">
+      <svg id="maxIcon" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="8" height="8" stroke="currentColor" stroke-width="1" />
+      </svg>
+    </button>
+    <button type="button" class="control-btn close-btn" id="closeBtn" title="Close" aria-label="Close">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+        <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
+</div>
 
-    <h1><span class="brand-moreweb">moreweb</span> Desktop</h1>
-    <div id="statusMessage" class="status-message">Initializing moreweb harness backend...</div>
-
-    <div id="spinner" class="spinner"></div>
-
-    <div id="errorView" class="error-view">
-      <div class="error-badge">Backend Launch Failed</div>
-      <div id="errorDetails" class="error-details"></div>
-      <div class="button-group">
-        <button id="retryBtn" class="btn btn-primary">Retry</button>
-        <button id="logsBtn" class="btn btn-secondary">Open Logs</button>
-      </div>
-    </div>
+<div class="splash-screen" id="splashScreen">
+  <div class="word">
+    <span>m</span><span>o</span><span>r</span><span>e</span>
   </div>
 
-  <script>
-    const statusMessage = document.getElementById('statusMessage');
-    const spinner = document.getElementById('spinner');
-    const errorView = document.getElementById('errorView');
-    const errorDetails = document.getElementById('errorDetails');
-    const retryBtn = document.getElementById('retryBtn');
-    const logsBtn = document.getElementById('logsBtn');
+  <div id="progress" class="progress"></div>
+  <div id="statusMessage" class="status"></div>
 
-    if (window.desktopAPI) {
-      window.desktopAPI.onServerStatus((status) => {
-        if (status.state === 'starting') {
-          spinner.style.display = 'block';
-          errorView.style.display = 'none';
-          statusMessage.textContent = status.message || 'Starting backend server...';
-        } else if (status.state === 'running') {
-          statusMessage.textContent = 'Backend ready! Loading interface...';
-        } else if (status.state === 'error') {
-          spinner.style.display = 'none';
-          errorView.style.display = 'flex';
-          statusMessage.textContent = 'Could not start backend service.';
-          errorDetails.textContent = status.message || 'Unknown error occurred.';
-        }
-      });
+  <div id="errorView" class="error-view">
+    <div class="error-badge">Backend Launch Failed</div>
+    <div id="errorDetails" class="error-details"></div>
+    <div class="button-group">
+      <button id="retryBtn" class="btn btn-primary">Retry</button>
+      <button id="logsBtn" class="btn btn-secondary">Open Logs</button>
+    </div>
+  </div>
+</div>
 
-      retryBtn.addEventListener('click', () => {
-        spinner.style.display = 'block';
-        errorView.style.display = 'none';
-        statusMessage.textContent = 'Restarting server...';
-        window.desktopAPI.restartServer();
-      });
+<script>
+  const splashScreen = document.getElementById('splashScreen');
+  const statusMessage = document.getElementById('statusMessage');
+  const progress = document.getElementById('progress');
+  const errorView = document.getElementById('errorView');
+  const errorDetails = document.getElementById('errorDetails');
+  const retryBtn = document.getElementById('retryBtn');
+  const logsBtn = document.getElementById('logsBtn');
 
-      logsBtn.addEventListener('click', () => {
-        window.desktopAPI.openLogFolder();
-      });
-    } else {
-      spinner.style.display = 'none';
-      errorView.style.display = 'flex';
-      statusMessage.textContent = 'Desktop API initialization error';
-      errorDetails.textContent = 'Preload bridge is unavailable. Please restart the application or reinstall.';
+  function showLoading(message) {
+    splashScreen.classList.remove('leaving');
+    progress.style.display = 'block';
+    errorView.classList.remove('visible');
+    statusMessage.textContent = message || '';
+  }
+
+  function showError(message) {
+    progress.style.display = 'none';
+    errorView.classList.add('visible');
+    statusMessage.textContent = 'Could not start backend service.';
+    errorDetails.textContent = message;
+  }
+
+  if (window.desktopAPI) {
+    window.desktopAPI.onServerStatus((status) => {
+      if (status.state === 'starting') {
+        showLoading();
+      } else if (status.state === 'running') {
+        // Play the blur-out, then main process swaps to the web app URL.
+        splashScreen.classList.add('leaving');
+      } else if (status.state === 'error') {
+        showError(status.message || 'Unknown error occurred.');
+      }
+    });
+
+    retryBtn.addEventListener('click', () => {
+      showLoading('Restarting server...');
+      window.desktopAPI.restartServer();
+    });
+
+    logsBtn.addEventListener('click', () => {
+      window.desktopAPI.openLogFolder();
+    });
+
+    // Window controls
+    const minBtn = document.getElementById('minBtn');
+    const maxBtn = document.getElementById('maxBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const maxIcon = document.getElementById('maxIcon');
+    const dragRegion = document.getElementById('dragRegion');
+
+    function updateMaxIcon(isMax) {
+      if (isMax) {
+        maxIcon.innerHTML = '<rect x="2.5" y="0.5" width="7" height="7" stroke="currentColor" stroke-width="1" /><path d="M0.5 2.5V9.5H7.5" stroke="currentColor" stroke-width="1" />';
+        maxBtn.title = 'Restore';
+        maxBtn.setAttribute('aria-label', 'Restore');
+      } else {
+        maxIcon.innerHTML = '<rect x="1" y="1" width="8" height="8" stroke="currentColor" stroke-width="1" />';
+        maxBtn.title = 'Maximize';
+        maxBtn.setAttribute('aria-label', 'Maximize');
+      }
     }
-  </script>
+
+    minBtn.addEventListener('click', () => {
+      void window.desktopAPI.minimize?.();
+    });
+
+    maxBtn.addEventListener('click', async () => {
+      const isMax = await window.desktopAPI.maximize?.();
+      updateMaxIcon(Boolean(isMax));
+    });
+
+    closeBtn.addEventListener('click', () => {
+      void window.desktopAPI.close?.();
+    });
+
+    dragRegion?.addEventListener('dblclick', () => {
+      void window.desktopAPI.maximize?.().then((max) => updateMaxIcon(Boolean(max)));
+    });
+
+    void window.desktopAPI.isMaximized?.().then((max) => updateMaxIcon(Boolean(max)));
+    window.desktopAPI.onMaximizedChange?.(updateMaxIcon);
+  } else {
+    const closeBtn = document.getElementById('closeBtn');
+    closeBtn?.addEventListener('click', () => {
+      window.close();
+    });
+    showError('Preload bridge is unavailable. Please restart the application or reinstall.');
+    statusMessage.textContent = 'Desktop API initialization error';
+  }
+</script>
+
 </body>
 </html>

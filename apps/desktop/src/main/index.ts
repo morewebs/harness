@@ -13,6 +13,9 @@ import { buildApplicationMenu } from './menu.js'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
+/** Delay before navigating to the backend URL, so the splash blur-out in loading.css can play. */
+const SPLASH_EXIT_MS = 400
+
 let mainWindow: BrowserWindow | null = null
 let serverManager: ServerManager | null = null
 
@@ -58,13 +61,17 @@ if (!gotTheLock) {
 async function startBackendAndLoad(): Promise<void> {
   if (!mainWindow || !serverManager) return
 
-  // Show loading screen
+  // Show splash / loading screen
   await mainWindow.loadFile(getLoadingHtmlPath())
 
   try {
     const url = await serverManager.start()
     if (!mainWindow.isDestroyed()) {
-      await mainWindow.loadURL(url)
+      // Let the splash exit animation play before the window navigates away.
+      await new Promise<void>(resolve => setTimeout(resolve, SPLASH_EXIT_MS))
+      if (!mainWindow.isDestroyed()) {
+        await mainWindow.loadURL(url)
+      }
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
@@ -85,7 +92,9 @@ function createWindow(): void {
     minHeight: 600,
     title: 'moreweb Desktop',
     show: false,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#000000',
+    titleBarStyle: 'hidden',
+    autoHideMenuBar: true,
     webPreferences: {
       preload: getPreloadScriptPath(),
       contextIsolation: true,
@@ -93,6 +102,28 @@ function createWindow(): void {
       sandbox: false,
     },
   })
+
+  mainWindow.setMenuBarVisibility(false)
+
+  // Notify renderer when maximize / restore state changes
+  mainWindow.on('maximize', () => {
+    mainWindow?.webContents.send('dsh:window-maximized-change', true)
+  })
+  mainWindow.on('unmaximize', () => {
+    mainWindow?.webContents.send('dsh:window-maximized-change', false)
+  })
+
+  // Notify renderer on navigation state changes for back/forward buttons
+  const sendNavState = () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('dsh:nav-state-change', {
+        canGoBack: mainWindow.webContents.canGoBack(),
+        canGoForward: mainWindow.webContents.canGoForward(),
+      })
+    }
+  }
+  mainWindow.webContents.on('did-navigate', sendNavState)
+  mainWindow.webContents.on('did-navigate-in-page', sendNavState)
 
   // Smooth appearance once ready
   mainWindow.once('ready-to-show', () => {
@@ -149,6 +180,73 @@ function setupIpc(): void {
 
   ipcMain.handle('dsh:get-version', () => {
     return app.getVersion()
+  })
+
+  ipcMain.handle('dsh:window-minimize', () => {
+    mainWindow?.minimize()
+  })
+
+  ipcMain.handle('dsh:window-maximize', () => {
+    if (!mainWindow) return false
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize()
+      return false
+    } else {
+      mainWindow.maximize()
+      return true
+    }
+  })
+
+  ipcMain.handle('dsh:window-close', () => {
+    mainWindow?.close()
+  })
+
+  ipcMain.handle('dsh:window-is-maximized', () => {
+    return mainWindow?.isMaximized() ?? false
+  })
+
+  ipcMain.handle('dsh:can-go-back', () => {
+    return mainWindow?.webContents.canGoBack() ?? false
+  })
+
+  ipcMain.handle('dsh:can-go-forward', () => {
+    return mainWindow?.webContents.canGoForward() ?? false
+  })
+
+  ipcMain.handle('dsh:go-back', () => {
+    if (mainWindow?.webContents.canGoBack()) {
+      mainWindow.webContents.goBack()
+    }
+  })
+
+  ipcMain.handle('dsh:go-forward', () => {
+    if (mainWindow?.webContents.canGoForward()) {
+      mainWindow.webContents.goForward()
+    }
+  })
+
+  ipcMain.handle('dsh:popup-menu', (_event, { menuName, x, y }: { menuName: string; x?: number; y?: number }) => {
+    if (!mainWindow || !serverManager) return
+    const menu = buildApplicationMenu(serverManager, () => {
+      void (async () => {
+        if (serverManager) {
+          await serverManager.stop()
+          await startBackendAndLoad()
+        }
+      })()
+    })
+    const cleanName = menuName.toLowerCase()
+    const item = menu.items.find((i) => {
+      const label = (i.label ?? (i.role ? i.role : '')).replace(/&/g, '').toLowerCase()
+      return label === cleanName
+    })
+    if (item?.submenu) {
+      item.submenu.popup({
+        window: mainWindow,
+        x: typeof x === 'number' ? Math.round(x) : undefined,
+        y: typeof y === 'number' ? Math.round(y) : undefined,
+      })
+    }
   })
 }
 

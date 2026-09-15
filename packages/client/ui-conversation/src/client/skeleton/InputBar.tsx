@@ -461,32 +461,34 @@ export const InputBar = memo(function InputBar({
         </div>
         <div className={css.row}>
           <div className={css.tools}>
-            <Tooltip label={t('input.commands')} side="top" delayMs={500}>
-              <button
-                type="button"
-                className={css.add}
-                aria-label={t('input.commands')}
-                aria-haspopup="listbox"
-                aria-expanded={commandMenuOpen}
-                disabled={locked || toggleCommandMenu === undefined}
-                onMouseDown={keepFocus}
-                onClick={onToggleCommandMenu}
-              >
-                <IconPlusOutline16 size={14} />
-              </button>
-            </Tooltip>
-            <Tooltip label={t('file.attach')} side="top" delayMs={500}>
-              <button
-                type="button"
-                className={css.add}
-                aria-label={t('file.attach')}
-                disabled={subagent !== null || locked || machineBusy || addFiles === undefined}
-                onMouseDown={keepFocus}
-                onClick={() => { fileInputRef.current?.click() }}
-              >
-                <IconPaperclipOutline16 size={14} />
-              </button>
-            </Tooltip>
+            <div className={css.actions}>
+              <Tooltip label={t('input.commands')} side="top" delayMs={500}>
+                <button
+                  type="button"
+                  className={css.add}
+                  aria-label={t('input.commands')}
+                  aria-haspopup="listbox"
+                  aria-expanded={commandMenuOpen}
+                  disabled={locked || toggleCommandMenu === undefined}
+                  onMouseDown={keepFocus}
+                  onClick={onToggleCommandMenu}
+                >
+                  <IconPlusOutline16 size={14} />
+                </button>
+              </Tooltip>
+              <Tooltip label={t('file.attach')} side="top" delayMs={500}>
+                <button
+                  type="button"
+                  className={css.add}
+                  aria-label={t('file.attach')}
+                  disabled={subagent !== null || locked || machineBusy || addFiles === undefined}
+                  onMouseDown={keepFocus}
+                  onClick={() => { fileInputRef.current?.click() }}
+                >
+                  <IconPaperclipOutline16 size={14} />
+                </button>
+              </Tooltip>
+            </div>
             <input
               ref={fileInputRef}
               type="file"

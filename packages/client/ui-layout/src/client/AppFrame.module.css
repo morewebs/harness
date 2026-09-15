@@ -1,7 +1,7 @@
 .frame {
   position: relative; /* anchors the drag handles, which straddle column borders */
   display: grid;
-  grid-template-rows: 100%;
+  grid-template-rows: auto 1fr;
   height: 100%;
   overflow: hidden;
   background: var(--dsw-alias-bg-base);
@@ -23,6 +23,8 @@
 }
 
 .sidebarCol {
+  grid-column: 1;
+  grid-row: 2;
   min-width: 0;
   overflow: hidden;
   background: var(--dsw-specific-sidebar-fill);
@@ -30,6 +32,8 @@
 }
 
 .centerCol {
+  grid-column: 2;
+  grid-row: 2;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -37,6 +41,8 @@
 }
 
 .detailsCol {
+  grid-column: 3;
+  grid-row: 2;
   min-width: 0;
   overflow: hidden;
   border-left: 0.5px solid var(--dsw-alias-border-l3);
@@ -53,7 +59,7 @@
    adds a visible 12x32 pill at vertical center; sidebar keeps only the hit strip. */
 .handle {
   position: absolute;
-  top: 0;
+  top: 35px;
   bottom: 0;
   width: 8px;
   margin-left: -4px;
@@ -109,7 +115,7 @@
 
 .overlayLayer {
   position: absolute;
-  inset: 0;
+  inset: 35px 0 0 0;
   z-index: 20;
   pointer-events: none;
 }

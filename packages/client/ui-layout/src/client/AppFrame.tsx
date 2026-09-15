@@ -17,6 +17,7 @@ import type {
 } from '@deepseek-ai/dsh-client-ui-slots'
 import { computeColumns, SIDEBAR_AUTO_COLLAPSE, SIDEBAR_DEFAULT } from './columns.ts'
 import { DocumentTitle } from './DocumentTitle.tsx'
+import { TopBar } from './TopBar.tsx'
 import type { createLayoutStore } from './stores.ts'
 import css from './AppFrame.module.css'
 
@@ -184,6 +185,10 @@ export function AppFrame({
       <DocumentTitle
         productTitle={productTitle}
         {...documentTitle === undefined ? {} : { title: documentTitle }}
+      />
+      <TopBar
+        onToggleSidebar={() => { actions.toggleSidebar() }}
+        sidebarCollapsed={sidebarCollapsed}
       />
       <div className={css.sidebarCol}>
         {/* Render-site slot call with live concession output: a closed

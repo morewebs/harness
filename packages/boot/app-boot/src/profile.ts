@@ -245,14 +245,14 @@ function ensureSymlink(link: string, target: string): void {
       stat = undefined
     }
     if (stat !== undefined) {
-      if (symlinkPointsTo(link, target)) return
+      if (symlinkPointsTo(link, target) && readlinkSync(link) === resolve(target)) return
       // unlink deletes the reparse point itself on Windows too; rmSync treats a
       // junction as a directory and throws EISDIR unless recursive.
       unlinkSync(link)
     }
   }
   try {
-    symlinkSync(target, link, 'junction')
+    symlinkSync(target.replace(/[\\/]+$/, ''), link, 'junction')
   } catch (error) {
     // Concurrent launches heal the same fallback; losing the race to a
     // process writing the identical link is success, anything else is not.
@@ -281,6 +281,11 @@ function canonicalLinkPath(path: string): string | undefined {
 
 /** Return whether a symlink or junction points at the same path as `target`. */
 function symlinkPointsTo(link: string, target: string): boolean {
+  try {
+    statSync(link)
+  } catch {
+    return false
+  }
   const actual = resolve(dirname(link), readlinkSync(link))
   const canonicalActual = canonicalLinkPath(actual)
   const canonicalTarget = canonicalLinkPath(resolve(target))
@@ -537,7 +542,13 @@ function moduleFallbackEntryCurrent(modulesDir: string, entry: ModuleFallbackEnt
   try {
     const stat = lstatSync(link)
     if (entry.kind === 'symlink') {
-      return stat.isSymbolicLink() && readlinkSync(link) === entry.packageDir
+      if (!stat.isSymbolicLink() || readlinkSync(link) !== entry.packageDir) return false
+      try {
+        statSync(link)
+        return true
+      } catch {
+        return false
+      }
     }
     if (!stat.isDirectory()) return false
     const existing = readModuleProxyRecord(link)

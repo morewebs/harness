@@ -12,9 +12,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import clsx from 'clsx'
 import {
-  Button, IconCloseFill14, IconPersonalizationOutline16,
-  IconProjectAddOutline16, IconSearchOutline16, Menu, Modal, Tooltip,
+  Button, IconChevronDownOutline14, IconCloseFill14, IconEllipsisOutline16,
+  IconPlusOutline16, IconSearchOutline16, Menu, Modal, Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
+
+
 import type {
   SessionListState, SessionSearchResultItem,
 } from '@deepseek-ai/dsh-api-session-controller/client'
@@ -203,9 +205,10 @@ function ViewOptionsMenu({ groupBy, orderBy, onGroupPick, onOrderPick, t }: {
             aria-label={t('viewOptions.label')}
             onClick={() => { setOpen(v => !v) }}
           >
-            <IconPersonalizationOutline16 />
+            <IconEllipsisOutline16 size={15} />
           </button>
         </Tooltip>
+
       )}
     />
   )
@@ -610,8 +613,16 @@ function SessionTree({
             </div>
           )
         })}
+        {groups.length > 0 && !groups.some(g => g.workspaceId === undefined) && (
+          <div className={css.recentsSection}>
+            <div className={css.sectionCategoryLabel}>{t('section.recents')}</div>
+            <div className={css.emptyNoChats}>{t('empty.noChats')}</div>
+          </div>
+        )}
       </div>
       <span className={css.fade} />
+
+
     </div>
   )
 }
@@ -1119,7 +1130,10 @@ export function WorkspaceBrowser({
       <div className={css.sectionHeader}>
         {wide && (
           <span className={clsx(css.sectionLabel, css.wide, searchExpanded && css.sectionLabelHidden)}>
-            {groupBy === 'flat' ? t('section.sessions') : t('section.workspaces')}
+            <span className={css.sectionLabelText}>
+              {groupBy === 'flat' ? t('section.sessions') : t('section.workspaces')}
+            </span>
+            {groupBy !== 'flat' && <IconChevronDownOutline14 size={12} className={css.sectionLabelChevron} />}
           </span>
         )}
         {wide && (
@@ -1203,11 +1217,12 @@ export function WorkspaceBrowser({
                   setWsPickerOpen(v => !v)
                 }}
               >
-                <IconProjectAddOutline16 size={wide ? 16 : 18} />
+                <IconPlusOutline16 size={wide ? 16 : 18} />
               </button>
             </Tooltip>
           )}
         </div>
+
         {/* Add flow + its error dialog (same package — direct composition). */}
         <WorkspacePickFlow
           t={t}

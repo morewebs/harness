@@ -14,6 +14,17 @@ export interface DesktopBridge {
   openExternal: (url: string) => Promise<void>
   getVersion: () => Promise<string>
   onServerStatus: (callback: (status: { state: string; message?: string }) => void) => () => void
+  minimize: () => Promise<void>
+  maximize: () => Promise<boolean>
+  close: () => Promise<void>
+  isMaximized: () => Promise<boolean>
+  canGoBack: () => Promise<boolean>
+  canGoForward: () => Promise<boolean>
+  goBack: () => Promise<void>
+  goForward: () => Promise<void>
+  popupMenu: (menuName: string, x?: number, y?: number) => Promise<void>
+  onMaximizedChange: (callback: (isMaximized: boolean) => void) => () => void
+  onNavStateChange: (callback: (state: { canGoBack: boolean; canGoForward: boolean }) => void) => () => void
 }
 
 const desktopBridge: DesktopBridge = {
@@ -24,6 +35,33 @@ const desktopBridge: DesktopBridge = {
   openLogFolder: () => ipcRenderer.invoke('dsh:open-log-folder'),
   openExternal: (url: string) => ipcRenderer.invoke('dsh:open-external', url),
   getVersion: () => ipcRenderer.invoke('dsh:get-version'),
+  minimize: () => ipcRenderer.invoke('dsh:window-minimize'),
+  maximize: () => ipcRenderer.invoke('dsh:window-maximize'),
+  close: () => ipcRenderer.invoke('dsh:window-close'),
+  isMaximized: () => ipcRenderer.invoke('dsh:window-is-maximized'),
+  canGoBack: () => ipcRenderer.invoke('dsh:can-go-back'),
+  canGoForward: () => ipcRenderer.invoke('dsh:can-go-forward'),
+  goBack: () => ipcRenderer.invoke('dsh:go-back'),
+  goForward: () => ipcRenderer.invoke('dsh:go-forward'),
+  popupMenu: (menuName, x, y) => ipcRenderer.invoke('dsh:popup-menu', { menuName, x, y }),
+  onMaximizedChange: (callback) => {
+    const subscription = (_event: Electron.IpcRendererEvent, isMaximized: boolean): void => {
+      callback(isMaximized)
+    }
+    ipcRenderer.on('dsh:window-maximized-change', subscription)
+    return () => {
+      ipcRenderer.removeListener('dsh:window-maximized-change', subscription)
+    }
+  },
+  onNavStateChange: (callback) => {
+    const subscription = (_event: Electron.IpcRendererEvent, state: { canGoBack: boolean; canGoForward: boolean }): void => {
+      callback(state)
+    }
+    ipcRenderer.on('dsh:nav-state-change', subscription)
+    return () => {
+      ipcRenderer.removeListener('dsh:nav-state-change', subscription)
+    }
+  },
   onServerStatus: (callback) => {
     const subscription = (_event: Electron.IpcRendererEvent, status: { state: string; message?: string }): void => {
       callback(status)

@@ -9,7 +9,7 @@ const src = (rel: string): string => fileURLToPath(new URL(rel, import.meta.url)
 const STANDALONE_ERROR = 'apps/web is not a standalone application: bare Vite cannot inject window.__DSH_BOOT__. '
   + 'From a repository checkout, run `pnpm dsh web`; an installed package uses `dsh web`. '
   + 'For client-plugin HMR, run `pnpm dsh web` together with `pnpm run dev:web`.'
-const DEFAULT_CLIENT_TITLE = 'DSH Local Build'
+const DEFAULT_CLIENT_TITLE = 'moreweb'
 
 /** Escape build-time text before placing it in the HTML title element. */
 function escapeHtmlText(value: string): string {
@@ -22,7 +22,7 @@ function clientDocumentTitle(): Plugin {
   return {
     name: 'dsh-client-document-title',
     transformIndexHtml(html) {
-      return html.replace('<title>DSH Local Build</title>', `<title>${title}</title>`)
+      return html.replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
     },
   }
 }
@@ -218,6 +218,8 @@ export default defineConfig({
   },
   define: {
     ...clientBuildEnvironmentDefines(process.env),
+    'process.env.DSH_CLIENT_TITLE': JSON.stringify(process.env.DSH_CLIENT_TITLE ?? 'moreweb'),
+    'process.env.DSH_CLIENT_BUILD_PROFILE': JSON.stringify(process.env.DSH_CLIENT_BUILD_PROFILE ?? 'official'),
     // vendored loader internal.ts: fromInternal() probes the Node major —
     // "0.0.0" takes neither branch, returning undefined (exactly the empty
     // internal slot the shell boot fills with the client module loader).

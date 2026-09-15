@@ -10,6 +10,8 @@ export const zh = {
   'session.new': '新会话',
   'section.workspaces': '工作区',
   'section.sessions': '会话',
+  'section.pinned': '置顶',
+  'section.recents': '最近',
   'viewOptions.label': '视图选项',
   'groupBy.label': '分组方式',
   'groupBy.workspace': '按工作区',
@@ -20,7 +22,10 @@ export const zh = {
   'sessions.expand': '展开其余 {n} 个会话',
   'sessions.collapse': '收起',
   'empty.none': '暂无会话',
+  'empty.noChats': '无对话',
   'empty.noMatches': '无匹配结果',
+
+
   'workspace.add': '添加工作区',
   'search.sessions.aria': '搜索会话',
   'search.placeholder': '搜索会话…',
@@ -76,10 +81,12 @@ export type WorkspaceKey = keyof typeof zh
 
 /** English dictionary, checked complete against the zh key set. */
 export const en = {
-  'group.ungrouped': 'Ungrouped',
+  'group.ungrouped': 'Recents',
   'session.new': 'New Session',
-  'section.workspaces': 'Workspaces',
+  'section.workspaces': 'Projects',
   'section.sessions': 'Sessions',
+  'section.pinned': 'Pinned',
+  'section.recents': 'Recents',
   'viewOptions.label': 'View options',
   'groupBy.label': 'Group by',
   'groupBy.workspace': 'WorkSpace',
@@ -90,7 +97,9 @@ export const en = {
   'sessions.expand': 'Show {n} more sessions',
   'sessions.collapse': 'Show less',
   'empty.none': 'No sessions yet',
+  'empty.noChats': 'No chats',
   'empty.noMatches': 'No matches',
+
   'workspace.add': 'Add workspace',
   'search.sessions.aria': 'Search sessions',
   'search.placeholder': 'Search sessions...',

@@ -230,6 +230,7 @@
 }
 
 .tools,
+.actions,
 .modes,
 .trailing {
   display: flex;
@@ -237,15 +238,22 @@
   min-width: 0;
 }
 
-/* figma 75:8208 drew 16 between + and the mode chips and 4 between Plan /
-   Read-only; the chip gap widened to 12 so the pill chips read as separate
-   controls. */
+.actions {
+  flex: none;
+  gap: 6px;
+}
+
 .tools {
-  gap: 16px;
+  gap: 6px;
 }
 
 .modes {
-  gap: 12px;
+  gap: 6px;
+}
+
+.actions:empty,
+.modes:empty {
+  display: none;
 }
 
 .trailing {
