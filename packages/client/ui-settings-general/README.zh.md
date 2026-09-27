@@ -9,7 +9,7 @@ kind: "package-reference"
 
 ## 概述
 
-`dsh-client-ui-settings-general` 是 dsh Web 客户端的设置外壳：Settings 面板从侧边栏底部的控件打开，该控件旁的连接故障指示器提供即时恢复操作；导航由各功能贡献的分区构建；首次运行的用户一次只走一个引导步骤。它还注册设置页面上所有不属于单一功能的内容：触发器、标题栏与关闭控件界面框架、「本地配置文件」操作、「通用」分区及其 `settings.general.item` slot，以及 `settings` 字典。归具体功能所有的行（「权限」、「语言」、「外观」）、分区（「模型」）与条件式首次使用引导步骤仍由各自的功能包提供；外壳本身不自带任何引导文案。
+`dsh-client-ui-settings-general` 是 dsh Web 客户端的设置外壳：Settings 面板从侧边栏底部的控件打开，或经跨条目的 `ctx.settingsUI` 打开命令进入；该控件旁的连接故障指示器提供即时恢复操作；导航由各功能贡献的分区构建；首次运行的用户一次只走一个引导步骤。它还注册设置页面上所有不属于单一功能的内容：触发器、标题栏与关闭控件界面框架、「本地配置文件」操作、「通用」分区及其 `settings.general.item` slot，以及 `settings` 字典。归具体功能所有的行（「权限」、「语言」、「外观」）、分区（「模型」）与条件式首次使用引导步骤仍由各自的功能包提供；外壳本身不自带任何引导文案。
 
 ## 目录
 
@@ -34,6 +34,10 @@ kind: "package-reference"
 ### 打开配置文件
 
 在回环浏览器上，只有当宿主确认可准备好一份由提供方持有的本地文档时，外壳才渲染**打开配置文件**。该操作会在原生文本编辑器中打开该文档（macOS 上绕过浏览器文件关联）。远程浏览器从不注册该操作，也从不发起这项特权设置读取。
+
+### 设置打开服务
+
+`ctx.settingsUI` 是外壳面向跨条目的一命令接口：`open(sectionId?)` 打开模态面板，并可选地按 id 选中某个导航分区——侧边栏导航集群用它直达「插件」分区与内置插件市场。请求携带一个没有注册分区的 id 时回退到第一行。在外壳条目接好自身 store 之前调用该服务会抛出错误。
 
 ### 引导步骤
 
@@ -60,6 +64,10 @@ kind: "package-reference"
 ### 文档可用性
 
 在 loopback 页面上，Client 通过 `settings/describe` 加载提供方的 `hasDocument` 能力，且只有在 Host 确认可准备好一份由提供方持有的本地文档时才渲染配置文件操作。该操作调用无路径参数且经浏览器认证的 `settings/openSettingsDocument` Remote；Host 会再次解析提供方路径、在文档缺失时将其创建出来，并交给原生文本编辑器（macOS 上使用 `open -t`，绕过浏览器文件关联；Linux 和 Windows 上使用桌面文件关联；WSL 上经 `wslpath -w` 转换后使用 Windows 文件关联）。打开失败时该操作仍可使用，并渲染本地化错误。临时读取失败或 Host 拓扑变化后，重新打开对话框或重新连接会刷新可用性。非 loopback 页面保留 Client 策略，不提供该原生操作及其 settings 读取。
+
+### 外壳 store 与设置打开服务
+
+模态打开状态与当前分区 id 存放在 `sidebar.settings` 条目的 store（`createSettingsShellStore`）里，而非组件状态：注册的 inject 工厂把绑定的 actions 交给对外提供的 `ctx.settingsUI` 控制器——与 ui-layout 把 `ctx.layout` 接到根条目 store 的装配方式一致。`open(sectionId?)` 在面板已打开时同样切换分区；`close` 清空选择，再次直接打开时从第一行开始。
 
 ### 宿主端
 

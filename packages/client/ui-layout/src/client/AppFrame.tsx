@@ -26,7 +26,7 @@ export type AppFrameProps =
   & PropsRuntime<'root'>
   & PropsRenderSlots<'sidebar' | 'conversation' | 'details' | 'shell.overlay'>
   & PropsStore<ReturnType<typeof createLayoutStore>>
-  & PropsLocale<'common'>
+  & PropsLocale<'layout'>
 
 /** Center column grid item (session-body building block). */
 function CenterColumn(props: { children?: ReactNode }) {
@@ -187,6 +187,7 @@ export function AppFrame({
         {...documentTitle === undefined ? {} : { title: documentTitle }}
       />
       <TopBar
+        t={t}
         onToggleSidebar={() => { actions.toggleSidebar() }}
         sidebarCollapsed={sidebarCollapsed}
       />

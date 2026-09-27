@@ -185,20 +185,6 @@ exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsul
           />
         </button>
         <button
-          aria-label="Notifications"
-          class="headerActionButton"
-          type="button"
-        >
-          <svg
-            data-content="46dea92f"
-            fill="none"
-            height="16"
-            viewBox="2 0.25 12 14"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          />
-        </button>
-        <button
           aria-label="Collapse sidebar"
           class="iconButton toggle"
           type="button"
@@ -249,50 +235,6 @@ exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsul
           width="14"
           xmlns="http://www.w3.org/2000/svg"
         />
-      </button>
-      <button
-        class="codexNavItem"
-        type="button"
-      >
-        <span
-          class="navLeading"
-        >
-          <svg
-            data-content="a31c303c"
-            fill="none"
-            height="16"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          />
-          <span
-            class="navItemLabel"
-          >
-            Pull requests
-          </span>
-        </span>
-      </button>
-      <button
-        class="codexNavItem"
-        type="button"
-      >
-        <span
-          class="navLeading"
-        >
-          <svg
-            data-content="2a91a8d7"
-            fill="none"
-            height="16"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          />
-          <span
-            class="navItemLabel"
-          >
-            Scheduled
-          </span>
-        </span>
       </button>
       <button
         class="codexNavItem"
@@ -461,20 +403,6 @@ exports[`sidebar shell snapshots > renders the expanded column in the default lo
           />
         </button>
         <button
-          aria-label="通知"
-          class="headerActionButton"
-          type="button"
-        >
-          <svg
-            data-content="46dea92f"
-            fill="none"
-            height="16"
-            viewBox="2 0.25 12 14"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          />
-        </button>
-        <button
           aria-label="收起侧边栏"
           class="iconButton toggle"
           type="button"
@@ -525,50 +453,6 @@ exports[`sidebar shell snapshots > renders the expanded column in the default lo
           width="14"
           xmlns="http://www.w3.org/2000/svg"
         />
-      </button>
-      <button
-        class="codexNavItem"
-        type="button"
-      >
-        <span
-          class="navLeading"
-        >
-          <svg
-            data-content="a31c303c"
-            fill="none"
-            height="16"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          />
-          <span
-            class="navItemLabel"
-          >
-            拉取请求
-          </span>
-        </span>
-      </button>
-      <button
-        class="codexNavItem"
-        type="button"
-      >
-        <span
-          class="navLeading"
-        >
-          <svg
-            data-content="2a91a8d7"
-            fill="none"
-            height="16"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          />
-          <span
-            class="navItemLabel"
-          >
-            定时任务
-          </span>
-        </span>
       </button>
       <button
         class="codexNavItem"

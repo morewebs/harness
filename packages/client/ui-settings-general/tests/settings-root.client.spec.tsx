@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { useEffect, useState } from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { bindSnapshotSelector, makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import type { SettingsRootComponentProps } from '../src/client/shell-contract.ts'
 import { SettingsRoot } from '../src/client/SettingsRoot.tsx'
+import { createSettingsShellStore } from '../src/client/settings-shell-store.ts'
 import { en } from '../src/client/locales.ts'
 
 afterEach(() => {
@@ -48,12 +48,26 @@ function mount({
   rows?: Row[]
   steps?: Step[]
 } = {}) {
-  // Mutable row source standing in for the bound useSections hook; bump()
-  // plays a ledger change through the same observable contract.
+  // Mutable observable sources standing in for the injected hooks; bump() and
+  // setConnectionState() play ledger changes through the same uSES contract.
   let current = rows
   let currentConnectionState = connectionState
   const listeners = new Set<() => void>()
   const connectionListeners = new Set<() => void>()
+  const rowsSource = {
+    getSnapshot: () => current,
+    subscribe: (listener: () => void) => {
+      listeners.add(listener)
+      return () => { listeners.delete(listener) }
+    },
+  }
+  const connectionSource = {
+    getSnapshot: () => currentConnectionState,
+    subscribe: (listener: () => void) => {
+      connectionListeners.add(listener)
+      return () => { connectionListeners.delete(listener) }
+    },
+  }
   const reconnect = vi.fn()
   const renderSlot = vi.fn(
     ((key: string, _owner: unknown, opts?: { only?: string }) => {
@@ -69,6 +83,7 @@ function mount({
       byId: { 'active-session': { blank: false } },
     })) as never
   const unusedHook = (() => { throw new Error('unused by SettingsRoot') }) as never
+  const shell = createSettingsShellStore().create()
   const props: SettingsRootComponentProps = {
     useSessions,
     useSessionPendingInteraction,
@@ -76,25 +91,11 @@ function mount({
     wide,
     reconnect,
     t: makeTranslate(en),
-    useConnectionState: (select) => {
-      const [, force] = useState(0)
-      useEffect(() => {
-        const listener = () => { force(n => n + 1) }
-        connectionListeners.add(listener)
-        return () => { connectionListeners.delete(listener) }
-      }, [])
-      return select(currentConnectionState)
-    },
+    useStore: bindSnapshotSelector(shell),
+    actions: shell.actions,
+    useConnectionState: bindSnapshotSelector(connectionSource),
     useOnboardingSteps: select => select(steps),
-    useSections: (select) => {
-      const [, force] = useState(0)
-      useEffect(() => {
-        const listener = () => { force(n => n + 1) }
-        listeners.add(listener)
-        return () => { listeners.delete(listener) }
-      }, [])
-      return select(current)
-    },
+    useSections: bindSnapshotSelector(rowsSource),
     renderSlot,
   }
   const view = render(<SettingsRoot {...props} />)

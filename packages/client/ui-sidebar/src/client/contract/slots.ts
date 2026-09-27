@@ -88,7 +88,8 @@ export interface SidebarFooterActionOwnerProps {
 /**
  * Registrant-private injected share (arrives via the register inject
  * factory). The shell keeps only its own controls: starting a Session from
- * the New Session button and toggling the column.
+ * the New Session button, toggling the column, and opening the Settings
+ * modal at a named section from the nav cluster.
  */
 export type SidebarRootInjected = {
   /**
@@ -99,6 +100,8 @@ export type SidebarRootInjected = {
   startSession: (workspaceId?: WorkspaceId) => void
   /** Toggle the sidebar column through the layout service. */
   toggleSidebar: () => void
+  /** Open the Settings modal through ctx.settingsUI, optionally at a section id. */
+  openSettings: (sectionId?: string) => void
 }
 
 /**

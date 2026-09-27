@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-`dsh-client-ui-settings-general` is the settings shell of the dsh web client: the Settings panel opens from the sidebar's bottom control, a connection-failure indicator beside that control offers immediate recovery, the navigation is built from the sections features contribute, and first-run users are walked through one onboarding step at a time. It also registers everything on the Settings pages that belongs to no single feature: the trigger/header/close chrome content, the local configuration-file action, the General section and its `settings.general.item` slot, and the `settings` dictionaries. Feature-owned rows (Permission, Language, Appearance), sections (Models), and conditional onboarding steps stay with their feature packages; the shell itself ships no onboarding copy of its own.
+`dsh-client-ui-settings-general` is the settings shell of the dsh web client: the Settings panel opens from the sidebar's bottom control or through the cross-entry `ctx.settingsUI` open command, a connection-failure indicator beside that control offers immediate recovery, the navigation is built from the sections features contribute, and first-run users are walked through one onboarding step at a time. It also registers everything on the Settings pages that belongs to no single feature: the trigger/header/close chrome content, the local configuration-file action, the General section and its `settings.general.item` slot, and the `settings` dictionaries. Feature-owned rows (Permission, Language, Appearance), sections (Models), and conditional onboarding steps stay with their feature packages; the shell itself ships no onboarding copy of its own.
 
 ## Table of Contents
 
@@ -34,6 +34,10 @@ The General section holds rows registered into `settings.general.item` by featur
 ### Opening the configuration file
 
 On a loopback browser, the shell renders **Open configuration file** only when the Host confirms that a provider-owned local document can be prepared. The action opens that document in the native text editor (bypassing the browser file association on macOS). Remote browsers never register the action and never issue the privileged settings read.
+
+### The settings-open service
+
+`ctx.settingsUI` is the shell's one-command cross-entry face: `open(sectionId?)` opens the modal and optionally selects a nav section by id — the sidebar's nav cluster uses it to land on the Plugins tab and the built-in plugin market. A request naming an id no registered section carries falls back to the first row. Calling the service before the shell entry has wired its store throws.
 
 ### Onboarding steps
 
@@ -60,6 +64,10 @@ The shell is an explicit recovery consumer, so it injects Connection directly ra
 ### Document availability
 
 On a loopback page, the Client loads the provider's `hasDocument` capability through `settings/describe` and renders **Open configuration file** only when the Host confirms that a provider-owned local document can be prepared. The action calls the pathless, browser-authenticated `settings/openSettingsDocument` Remote; the Host resolves the provider path again, materializes an absent document, and hands it to a native text editor (`open -t` on macOS, bypassing a browser file association; the desktop file association on Linux and Windows; Windows association after `wslpath -w` translation on WSL). Open failures keep the action available and render a localized error. Reopening the dialog or reconnecting refreshes availability after a transient read failure or Host topology change. Non-loopback pages retain the Client policy that withholds this native action and its settings read.
+
+### Shell store and the settings-open service
+
+Modal open state and the active section id live in the `sidebar.settings` entry's store (`createSettingsShellStore`), not component state: the registration's inject factory hands the bound actions to the provided `ctx.settingsUI` controller, the same assembly ui-layout uses to wire `ctx.layout` to the root entry's store. `open(sectionId?)` also switches sections while the modal is already open; `close` clears the selection so a plain reopen starts at the first row.
 
 ### Host half
 

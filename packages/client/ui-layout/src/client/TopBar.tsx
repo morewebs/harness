@@ -9,10 +9,9 @@
  */
 import { useEffect, useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
-import { en as layoutEn, type LayoutKey } from './locales.ts'
+import type { TranslateNS } from '@deepseek-ai/dsh-client-ui-slots'
+import type { LayoutKey } from './locales.ts'
 import css from './TopBar.module.css'
-
-const t = (key: LayoutKey): string => layoutEn[key]
 
 export interface DesktopBridge {
   isDesktop?: boolean
@@ -38,6 +37,8 @@ declare global {
 
 /** Props for the TopBar component. */
 export interface TopBarProps {
+  /** Namespace-bound translate from the root registration's locale seat. */
+  t: TranslateNS<'layout'>
   /** Callback fired when the sidebar toggle icon button is clicked. */
   onToggleSidebar: () => void
   /** Current collapsed state of the primary sidebar. */
@@ -89,7 +90,7 @@ const MENU_ITEMS: readonly MenuItemDef[] = [
  * @param props - Component props containing sidebar state and toggle handler.
  * @returns Top bar element tree.
  */
-export function TopBar({ onToggleSidebar, sidebarCollapsed = false }: TopBarProps): ReactNode {
+export function TopBar({ t, onToggleSidebar, sidebarCollapsed = false }: TopBarProps): ReactNode {
   const [isMaximized, setIsMaximized] = useState(false)
   const [canGoBack, setCanGoBack] = useState(false)
   const [canGoForward, setCanGoForward] = useState(false)
@@ -100,7 +101,7 @@ export function TopBar({ onToggleSidebar, sidebarCollapsed = false }: TopBarProp
 
     // Query initial maximized state
     void window.desktopAPI.isMaximized?.().then((max) => {
-      setIsMaximized(Boolean(max))
+      setIsMaximized(max)
     })
 
     // Listen to maximize / restore changes
@@ -110,10 +111,10 @@ export function TopBar({ onToggleSidebar, sidebarCollapsed = false }: TopBarProp
 
     // Query initial navigation state
     void window.desktopAPI.canGoBack?.().then((back) => {
-      setCanGoBack(Boolean(back))
+      setCanGoBack(back)
     })
     void window.desktopAPI.canGoForward?.().then((fwd) => {
-      setCanGoForward(Boolean(fwd))
+      setCanGoForward(fwd)
     })
 
     // Listen to navigation state changes

@@ -1,7 +1,12 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render } from '@testing-library/react'
+import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { TopBar } from '../src/client/TopBar.tsx'
+import { en } from '../src/client/locales.ts'
+
+/** English translate stand-in for the registration's locale seat. */
+const t = makeTranslate(en)
 
 afterEach(() => {
   cleanup()
@@ -11,7 +16,7 @@ afterEach(() => {
 describe('TopBar', () => {
   it('renders sidebar toggle and fires onToggleSidebar', () => {
     const onToggle = vi.fn()
-    const { getByLabelText } = render(<TopBar onToggleSidebar={onToggle} sidebarCollapsed={false} />)
+    const { getByLabelText } = render(<TopBar t={t} onToggleSidebar={onToggle} sidebarCollapsed={false} />)
     const toggleBtn = getByLabelText('Collapse Primary Side Bar')
     expect(toggleBtn).toBeDefined()
     fireEvent.click(toggleBtn)
@@ -20,7 +25,7 @@ describe('TopBar', () => {
 
   it('reflects sidebarCollapsed state in tooltip and aria-label', () => {
     const onToggle = vi.fn()
-    const { getByLabelText } = render(<TopBar onToggleSidebar={onToggle} sidebarCollapsed={true} />)
+    const { getByLabelText } = render(<TopBar t={t} onToggleSidebar={onToggle} sidebarCollapsed={true} />)
     expect(getByLabelText('Open Primary Side Bar')).toBeDefined()
   })
 
@@ -28,7 +33,7 @@ describe('TopBar', () => {
     const backSpy = vi.spyOn(window.history, 'back').mockImplementation(() => {})
     const fwdSpy = vi.spyOn(window.history, 'forward').mockImplementation(() => {})
 
-    const { getByLabelText } = render(<TopBar onToggleSidebar={() => {}} />)
+    const { getByLabelText } = render(<TopBar t={t} onToggleSidebar={() => {}} />)
     fireEvent.click(getByLabelText('Back'))
     expect(backSpy).toHaveBeenCalledTimes(1)
 
@@ -66,7 +71,7 @@ describe('TopBar', () => {
       onNavStateChange: (cb) => { navChangeCb = cb; return () => {} },
     }
 
-    const { getByLabelText, getByText } = render(<TopBar onToggleSidebar={() => {}} />)
+    const { getByLabelText, getByText } = render(<TopBar t={t} onToggleSidebar={() => {}} />)
     await act(async () => {
       await Promise.resolve()
     })

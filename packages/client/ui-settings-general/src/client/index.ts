@@ -29,6 +29,8 @@ import { GeneralSection } from './GeneralSection.tsx'
 import { SettingsDocumentAction } from './SettingsDocumentAction.tsx'
 import type { SettingsDocumentActionInjected } from './SettingsDocumentAction.tsx'
 import { SettingsDocumentStore } from './settings-document-store.ts'
+import { createSettingsShellStore } from './settings-shell-store.ts'
+import { SettingsUIController, type SettingsShellActions } from './settings-ui.ts'
 import { en, zh, type SettingsKey } from './locales.ts'
 
 export type {
@@ -40,6 +42,13 @@ export type {
 export type { SettingsDocumentActionInjected, SettingsDocumentActionProps } from './SettingsDocumentAction.tsx'
 export type { SettingsDocumentState } from './settings-document-store.ts'
 export { SettingsDocumentStore } from './settings-document-store.ts'
+export type { SettingsShellState } from './settings-shell-store.ts'
+export { createSettingsShellStore } from './settings-shell-store.ts'
+export type { SettingsShellActions } from './settings-ui.ts'
+export { SettingsUIController } from './settings-ui.ts'
+// The settings-open face's Service Definition lives in the settings domain
+// base; re-exported here because this plugin is its Provider.
+export type { ISettingsUI } from '@deepseek-ai/dsh-client-ui-settings/client'
 export type { SettingsKey } from './locales.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
@@ -68,6 +77,13 @@ export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-settings-general: dictionaries')
   const connection = ctx.get('connection') as ConnectionHandle
 
+  // The cross-entry open face: the shell entry's inject factory adopts the
+  // store's bound actions (see below), the same assembly ui-layout uses for
+  // ctx.layout.
+  const settingsUI = new SettingsUIController()
+  const disposeSettingsUI = ctx.reflect.provide('settingsUI', settingsUI)
+  ctx.effect(() => () => { void disposeSettingsUI() }, 'ui-settings-general: settingsUI service')
+
   // Copy freshness is framework-owned: components read the standard `t`
   // seat, and the nav label is a thunk the owner resolves per render — no
   // locale/change re-registration wiring.
@@ -93,56 +109,59 @@ export function apply(ctx: ClientContext): void {
   let rows: readonly SettingsSectionRow[] = []
   let onboardingVersion = -1
   let onboardingSteps: readonly SettingsOnboardingStep[] = []
-  const shellInjected = (): SettingsRootInjected => ({
-    reconnect: () => { connection.reconnect() },
-    hooks: {
-      connectionState: connection.state,
-      sections: {
-        getSnapshot: () => {
-          const version = ctx.slots.getVersion('settings.section')
-          const revision = ctx.locale.getSnapshot().revision
-          if (version !== rowsVersion || revision !== rowsRevision) {
-            rowsVersion = version
-            rowsRevision = revision
-            rows = ctx.slots.entries('settings.section')
-              .map(e => ({
-                /* v8 ignore next -- list-slot registration requires id (SlotCore rejects an entry without one) */
-                id: e.options.id ?? '',
-                order: e.options.order ?? 0,
-                label: resolveSlotLabel(e.options.label) ?? '',
-              }))
-              .sort((a, b) => a.order - b.order)
-          }
-          return rows
+  const shellInjected = (shellActions: SettingsShellActions): SettingsRootInjected => {
+    settingsUI.attachShell(shellActions)
+    return {
+      reconnect: () => { connection.reconnect() },
+      hooks: {
+        connectionState: connection.state,
+        sections: {
+          getSnapshot: () => {
+            const version = ctx.slots.getVersion('settings.section')
+            const revision = ctx.locale.getSnapshot().revision
+            if (version !== rowsVersion || revision !== rowsRevision) {
+              rowsVersion = version
+              rowsRevision = revision
+              rows = ctx.slots.entries('settings.section')
+                .map(e => ({
+                  /* v8 ignore next -- list-slot registration requires id (SlotCore rejects an entry without one) */
+                  id: e.options.id ?? '',
+                  order: e.options.order ?? 0,
+                  label: resolveSlotLabel(e.options.label) ?? '',
+                }))
+                .sort((a, b) => a.order - b.order)
+            }
+            return rows
+          },
+          subscribe: (listener) => {
+            const offLedger = ctx.slots.subscribe('settings.section', listener)
+            const offLocale = ctx.locale.subscribe(listener)
+            return () => {
+              offLedger()
+              offLocale()
+            }
+          },
         },
-        subscribe: (listener) => {
-          const offLedger = ctx.slots.subscribe('settings.section', listener)
-          const offLocale = ctx.locale.subscribe(listener)
-          return () => {
-            offLedger()
-            offLocale()
-          }
+        onboardingSteps: {
+          getSnapshot: () => {
+            const version = ctx.slots.getVersion('settings.onboarding')
+            if (version !== onboardingVersion) {
+              onboardingVersion = version
+              onboardingSteps = ctx.slots.entries('settings.onboarding')
+                .map(e => ({
+                  /* v8 ignore next -- list-slot registration requires id */
+                  id: e.options.id ?? '',
+                  order: e.options.order ?? 0,
+                }))
+                .sort((a, b) => a.order - b.order)
+            }
+            return onboardingSteps
+          },
+          subscribe: listener => ctx.slots.subscribe('settings.onboarding', listener),
         },
       },
-      onboardingSteps: {
-        getSnapshot: () => {
-          const version = ctx.slots.getVersion('settings.onboarding')
-          if (version !== onboardingVersion) {
-            onboardingVersion = version
-            onboardingSteps = ctx.slots.entries('settings.onboarding')
-              .map(e => ({
-                /* v8 ignore next -- list-slot registration requires id */
-                id: e.options.id ?? '',
-                order: e.options.order ?? 0,
-              }))
-              .sort((a, b) => a.order - b.order)
-          }
-          return onboardingSteps
-        },
-        subscribe: listener => ctx.slots.subscribe('settings.onboarding', listener),
-      },
-    },
-  })
+    }
+  }
   ctx.slots.inject('sidebar.settings', () => ctx.slots.register({
     name: 'sidebar.settings',
     locale: NS,
@@ -154,6 +173,9 @@ export function apply(ctx: ClientContext): void {
       'settings.section': { kind: 'list', scope: 'root' },
       'settings.onboarding': { kind: 'list', scope: 'root' },
     },
+    // The shell's modal viewing state: entry-declared so cross-entry callers
+    // reach the open command through ctx.settingsUI (settings-ui.ts).
+    store: createSettingsShellStore,
     inject: shellInjected,
   }, SettingsRoot))
 

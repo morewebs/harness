@@ -7,6 +7,9 @@ import { apply as settingsApply, inject as settingsInject } from '@deepseek-ai/d
 import { apply, inject } from '../src/client/index.ts'
 import type { SettingsRootInjected } from '../src/client/shell-contract.ts'
 import { SettingsRoot } from '../src/client/SettingsRoot.tsx'
+import { createSettingsShellStore } from '../src/client/settings-shell-store.ts'
+import type { SettingsShellActions } from '../src/client/settings-ui.ts'
+import type { ISettingsUI } from '@deepseek-ai/dsh-client-ui-settings/client'
 
 async function bench() {
   const ctx = new Context()
@@ -47,9 +50,13 @@ function declare(slots: SlotRegistry): () => void {
   )
 }
 
-function injectedOf(slots: SlotRegistry): SettingsRootInjected {
+function injectedOf(slots: SlotRegistry, actions?: SettingsShellActions): SettingsRootInjected {
   const entry = slots.entries('sidebar.settings')[0]!
-  return (entry.inject as () => SettingsRootInjected)()
+  // The framework invokes the inject factory with the entry store's bound
+  // actions (InjectParams); a fresh instance stands in for the entry's own.
+  return (entry.inject as unknown as (actions: SettingsShellActions) => SettingsRootInjected)(
+    actions ?? createSettingsShellStore().create().actions,
+  )
 }
 
 /** The shell's child declarations (chrome, actions, sections, and onboarding overlays). */
@@ -148,6 +155,31 @@ describe('ui-settings apply', () => {
     await Promise.resolve()
     expect(listener).toHaveBeenCalledOnce()
     off()
+  })
+
+  it('exposes the shell store through ctx.settingsUI (the cross-entry open command)', async () => {
+    const b = await bench()
+    declare(b.slots)
+    await b.ctx.plugin({ inject: [...inject], apply }).await()
+    const shell = createSettingsShellStore().create()
+    injectedOf(b.slots, shell.actions)
+    const settingsUI = b.ctx.get('settingsUI') as ISettingsUI
+    settingsUI.open('plugins')
+    expect(shell.getSnapshot()).toEqual({ open: true, activeSectionId: 'plugins' })
+    // A bare open keeps the current section selection.
+    settingsUI.open()
+    expect(shell.getSnapshot()).toEqual({ open: true, activeSectionId: 'plugins' })
+    shell.actions.close()
+    settingsUI.open()
+    expect(shell.getSnapshot()).toEqual({ open: true, activeSectionId: undefined })
+  })
+
+  it('rejects ctx.settingsUI.open before the shell entry wired its actions', async () => {
+    const b = await bench()
+    declare(b.slots)
+    await b.ctx.plugin({ inject: [...inject], apply }).await()
+    const settingsUI = b.ctx.get('settingsUI') as ISettingsUI
+    expect(() => { settingsUI.open() }).toThrow(/not wired/)
   })
 
   it('re-registers after an HMR collapse re-declares the slot (stale disposer must not block)', async () => {

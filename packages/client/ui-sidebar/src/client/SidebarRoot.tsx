@@ -17,24 +17,9 @@
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
-  IconBranchOutline16, IconChevronDownOutline14, IconClockOutline16,
-  IconCordisPluginOutline14, IconEditOutline16, IconPanelLeftOutline16,
-  IconSearchOutline16, IconSparkle16, Tooltip,
+  IconChevronDownOutline14, IconCordisPluginOutline14, IconEditOutline16,
+  IconPanelLeftOutline16, IconSearchOutline16, IconSparkle16, Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
-
-function IconBellOutline16({ size = 16, className }: { size?: number; className?: string | undefined }) {
-  return (
-    <svg width={size} height={size} viewBox="2 0.25 12 14" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M8 1.5C6.067 1.5 4.5 3.067 4.5 5V7.586L3.293 8.793A1 1 0 004 10.5h8a1 1 0 00.707-1.707L11.5 7.586V5c0-1.933-1.567-3.5-3.5-3.5zm-1.5 10a1.5 1.5 0 003 0h-3z"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
 
 function IconPlusCircleOutline14({ size = 14, className }: { size?: number; className?: string | undefined }) {
   return (
@@ -95,6 +80,7 @@ export function SidebarRoot({
   width,
   startSession,
   toggleSidebar,
+  openSettings,
   t,
   renderSlot,
 }: SidebarRootComponentProps) {
@@ -221,35 +207,24 @@ export function SidebarRoot({
         )}
         <div className={css.headerTrailingActions}>
           {wide && (
-            <>
-              <Tooltip label={t('search')} delayMs={500}>
-                <button
-                  type="button"
-                  className={css.headerActionButton}
-                  aria-label={t('search')}
-                  onClick={() => {
-                    const searchInput = column.current?.querySelector<HTMLInputElement>('input[placeholder*="Search"], input[placeholder*="搜索"]')
-                    if (searchInput) {
-                      searchInput.focus()
-                    } else {
-                      const searchBtn = column.current?.querySelector<HTMLButtonElement>('button[aria-label*="Search"], button[aria-label*="搜索"]')
-                      searchBtn?.click()
-                    }
-                  }}
-                >
-                  <IconSearchOutline16 size={15} />
-                </button>
-              </Tooltip>
-              <Tooltip label={t('nav.notifications')} delayMs={500}>
-                <button
-                  type="button"
-                  className={css.headerActionButton}
-                  aria-label={t('nav.notifications')}
-                >
-                  <IconBellOutline16 size={16} />
-                </button>
-              </Tooltip>
-            </>
+            <Tooltip label={t('search')} delayMs={500}>
+              <button
+                type="button"
+                className={css.headerActionButton}
+                aria-label={t('search')}
+                onClick={() => {
+                  const searchInput = column.current?.querySelector<HTMLInputElement>('input[placeholder*="Search"], input[placeholder*="搜索"]')
+                  if (searchInput) {
+                    searchInput.focus()
+                  } else {
+                    const searchBtn = column.current?.querySelector<HTMLButtonElement>('button[aria-label*="Search"], button[aria-label*="搜索"]')
+                    searchBtn?.click()
+                  }
+                }}
+              >
+                <IconSearchOutline16 size={15} />
+              </button>
+            </Tooltip>
           )}
           {/* Rail resting state is the brand mark or panel toggle icon. */}
           <Tooltip label={collapsed ? t('toggle.open') : t('toggle.collapse')} delayMs={500}>
@@ -290,32 +265,21 @@ export function SidebarRoot({
 
         {wide && (
           <>
-            <button type="button" className={css.codexNavItem}>
-              <span className={css.navLeading}>
-                <IconBranchOutline16 size={16} />
-                <span className={css.navItemLabel}>{t('nav.pullRequests')}</span>
-              </span>
-            </button>
-            <button type="button" className={css.codexNavItem}>
-              <span className={css.navLeading}>
-                <IconClockOutline16 size={16} />
-                <span className={css.navItemLabel}>{t('nav.scheduled')}</span>
-              </span>
-            </button>
             <button
               type="button"
               className={css.codexNavItem}
-              onClick={() => {
-                const settingsBtn = column.current?.querySelector<HTMLButtonElement>('[aria-label*="Settings"], [aria-label*="设置"]')
-                settingsBtn?.click()
-              }}
+              onClick={() => { openSettings('plugins') }}
             >
               <span className={css.navLeading}>
                 <IconCordisPluginOutline14 size={16} />
                 <span className={css.navItemLabel}>{t('nav.plugins')}</span>
               </span>
             </button>
-            <button type="button" className={css.codexNavItem}>
+            <button
+              type="button"
+              className={css.codexNavItem}
+              onClick={() => { openSettings('market') }}
+            >
               <span className={css.navLeading}>
                 <IconSparkle16 size={16} />
                 <span className={css.navItemLabel}>{t('nav.explore')}</span>

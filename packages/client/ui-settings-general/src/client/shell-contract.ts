@@ -8,13 +8,14 @@
  */
 import type { ConnectionState } from '@deepseek-ai/dsh-client-connection/client'
 import type {
-  HostObservable, InjectFace, PropsLocale, PropsRenderSlots, PropsRuntime,
+  HostObservable, InjectFace, PropsLocale, PropsRenderSlots, PropsRuntime, PropsStore,
 } from '@deepseek-ai/dsh-client-ui-slots'
 // Type-only: pulls ui-sidebar's SlotMap merge (the 'sidebar.settings' entry)
 // into every program that sees this contract.
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 // Type-only: pulls the settings slot declarations the shell renders into.
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
+import type { createSettingsShellStore } from './settings-shell-store.ts'
 
 /** One nav row projected from a settings.section registration's options. */
 export interface SettingsSectionRow {
@@ -49,9 +50,10 @@ export type SettingsRootInjected = {
 
 /**
  * Full component props of the settings shell root: the sidebar owner share
- * (wide/rail state) plus the declared render shares and the injected face
- * (hooks compartment bound to useSections). No store is registered — modal
- * open state and active section id are component-local viewing state.
+ * (wide/rail state), the declared render shares, the injected face (hooks
+ * compartment bound to useSections), and the shell store share (modal open
+ * state and active section id — entry-declared so the cross-entry open
+ * command reaches it through ctx.settingsUI).
  */
 export type SettingsRootComponentProps =
   PropsRuntime<'sidebar.settings'>
@@ -63,5 +65,6 @@ export type SettingsRootComponentProps =
     | 'settings.section'
     | 'settings.onboarding'
   >
+  & PropsStore<ReturnType<typeof createSettingsShellStore>>
   & InjectFace<SettingsRootInjected>
   & PropsLocale<'settings'>
