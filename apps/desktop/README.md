@@ -1,5 +1,7 @@
 # moreweb Desktop
 
+English | [中文](README.zh.md)
+
 moreweb harness Desktop application: native Electron shell for the web GUI and local agent service.
 
 ## Overview

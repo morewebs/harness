@@ -105,7 +105,7 @@ export function buildApplicationMenu(
         {
           label: 'moreweb harness Documentation',
           click: () => {
-            void shell.openExternal('https://github.com/deepseek-ai/deepseek-harness')
+            void shell.openExternal('https://github.com/morewebs/harness')
           },
         },
         { type: 'separator' as const },

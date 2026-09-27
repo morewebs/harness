@@ -116,9 +116,10 @@ function createWindow(): void {
   // Notify renderer on navigation state changes for back/forward buttons
   const sendNavState = () => {
     if (mainWindow && !mainWindow.isDestroyed()) {
+      const history = mainWindow.webContents.navigationHistory
       mainWindow.webContents.send('dsh:nav-state-change', {
-        canGoBack: mainWindow.webContents.canGoBack(),
-        canGoForward: mainWindow.webContents.canGoForward(),
+        canGoBack: history.canGoBack(),
+        canGoForward: history.canGoForward(),
       })
     }
   }
@@ -206,22 +207,24 @@ function setupIpc(): void {
   })
 
   ipcMain.handle('dsh:can-go-back', () => {
-    return mainWindow?.webContents.canGoBack() ?? false
+    return mainWindow?.webContents.navigationHistory.canGoBack() ?? false
   })
 
   ipcMain.handle('dsh:can-go-forward', () => {
-    return mainWindow?.webContents.canGoForward() ?? false
+    return mainWindow?.webContents.navigationHistory.canGoForward() ?? false
   })
 
   ipcMain.handle('dsh:go-back', () => {
-    if (mainWindow?.webContents.canGoBack()) {
-      mainWindow.webContents.goBack()
+    const history = mainWindow?.webContents.navigationHistory
+    if (history?.canGoBack()) {
+      history.goBack()
     }
   })
 
   ipcMain.handle('dsh:go-forward', () => {
-    if (mainWindow?.webContents.canGoForward()) {
-      mainWindow.webContents.goForward()
+    const history = mainWindow?.webContents.navigationHistory
+    if (history?.canGoForward()) {
+      history.goForward()
     }
   })
 
@@ -237,7 +240,7 @@ function setupIpc(): void {
     })
     const cleanName = menuName.toLowerCase()
     const item = menu.items.find((i) => {
-      const label = (i.label ?? (i.role ? i.role : '')).replace(/&/g, '').toLowerCase()
+      const label = (i.label || (i.role ?? '')).replace(/&/g, '').toLowerCase()
       return label === cleanName
     })
     if (item?.submenu) {
