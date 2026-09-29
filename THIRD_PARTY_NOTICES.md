@@ -25,6 +25,15 @@ The Cordis framework and its foundation libraries are source-vendored into this 
 | `@deepseek-ai/cordis-plugin-hmr` | `@cordisjs/plugin-hmr` | [github.com/deepseek-harness/cordis](https://github.com/deepseek-harness/cordis) | MIT |
 | `@deepseek-ai/cordis-plugin-logger-console` | `@cordisjs/plugin-logger-console` | [github.com/deepseek-harness/cordis](https://github.com/deepseek-harness/cordis) | MIT |
 
+## Vendored font assets
+
+Font binaries served by the Web client under the moreweb brand are vendored into [`apps/web/public/fonts/`](apps/web/public/fonts/) rather than consumed as npm packages; each family is licensed under the SIL Open Font License 1.1 and the license text ships beside the font files.
+
+| Font | Upstream | License |
+| --- | --- | --- |
+| `Poppins` | [github.com/itfoundry/poppins](https://github.com/itfoundry/poppins) | OFL-1.1 |
+| `Space Mono` | [github.com/floriankarsten/space-mono](https://github.com/floriankarsten/space-mono) | OFL-1.1 |
+
 ## Runtime npm dependencies
 
 External packages that a workspace package resolves at runtime. The tier covers every plugin a user can mount from `cordis.yml` — not only what the `dsh` CLI, Web UI, and Python SDK runtime load by default.

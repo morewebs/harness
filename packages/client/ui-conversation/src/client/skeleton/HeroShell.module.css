@@ -1,6 +1,6 @@
-/* NEW SESSION hero (figma Input_Bottom 75:8208): fish + title, workspace chip
-   above the shared InputBar card. The input itself is InputBar — only stack
-   geometry and the chip live here. */
+/* NEW SESSION hero (figma Input_Bottom 75:8208): brand mark + title,
+   workspace chip above the shared InputBar card. The input itself is
+   InputBar — only stack geometry and the chip live here. */
 
 .root {
   display: flex;
@@ -21,6 +21,12 @@
   width: 100%;
   max-width: var(--dsh-composer-card-max-width);
   overflow: visible;
+}
+
+/* Brand mark centered above the headline. */
+.heroMark {
+  display: flex;
+  justify-content: center;
 }
 
 /* Headline: title and beta badge centered; 26/32 wt500. */

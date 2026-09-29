@@ -1,8 +1,8 @@
-/* Ongoing blue has no alias token (state-business-primary is the 500 step,
- * not this 450) — component-level var pinned to the static scale instead. */
+/* Ongoing work rides the brand accent through the business-primary alias;
+ * a component-level var keeps the pinning indirection in one place. */
 .dot,
 .matrix {
-  --dsh-state-ongoing: var(--dsw-static-deepseek-450);
+  --dsh-state-ongoing: var(--dsw-alias-state-business-primary);
 }
 
 /* Solid states: same-color halo via a 0.10-opacity outer layer (::before)

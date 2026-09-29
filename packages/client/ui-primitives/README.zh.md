@@ -29,7 +29,7 @@ kind: "package-library"
 
 ### 控件与图标
 
-`Button`、`Pill`、`Input`、`Menu`、`Modal`、`Tooltip`、`DisclosureRow`、`StateDot`、`HoverCard`、`Toast`、`ConnectionIndicator`、`RiskConfirmation` 与首次运行接管层 `OnboardingSurface` 覆盖常见的交互形态。`ic_ds_*` 图标集与 `FishLogo`/`BrandWordmark` 标记填充品牌与行内图标 slot。`LinkIcon` 为可点击产物链接绘制前置分类图形——地球、文件夹、代码、图片、文档或纸张，全部随 `currentColor`——`classifyLinkPath` 按扩展名推导文件路径的类别。`ConnectionIndicator` 可渲染警告色的断联操作、以独立于 retry 时序的 500ms 节奏推进一至三个点的连接中状态，或成功色的恢复状态。所有状态都为最长的输入 label 预留空间，并使用固定的图标列和文字列，因此文案变化不会移动控件或改变其宽度。它的 owner 提供可见性、恢复驻留时间、本地化 label 与立即重连回调；该原语不使用原生 title tooltip。`useAnchoredPosition` 与 `useAnchoredMaxHeight` 让浮动面板与底部锚定浮层始终钳制在视口内并跟随锚点。`HoverCard` 通过指针离开宽限期让采用 portal 的预览在跨过锚点间隙时仍可触及，并可通过 `copyText` prop 提供复制按钮。 `Toast` 的停留时长由使用方通过 `holdMs` 指定，因为横幅该留多久取决于有多少内容要读；同一个值同时驱动它的卸载定时器与样式表的淡出延迟，两者不可能再错位。 `rankByName` 是 `/` 菜单命令源与 skill 源共享的候选排序器：查询必须是名字的不区分大小写的有序子序列；前缀命中排最前，其次按对齐分数，再按来源顺序（[排名决策](../../../.agents/notes/implemented/feature/2026-08-04-web-slash-command-fuzzy-discovery.zh.md)）。
+`Button`、`Pill`、`Input`、`Menu`、`Modal`、`Tooltip`、`DisclosureRow`、`StateDot`、`HoverCard`、`Toast`、`ConnectionIndicator`、`RiskConfirmation` 与首次运行接管层 `OnboardingSurface` 覆盖常见的交互形态。`ic_ds_*` 图标集与 `BrandMark`/`BrandWordmark` 标记对填充品牌与行内图标 slot。`LinkIcon` 为可点击产物链接绘制前置分类图形——地球、文件夹、代码、图片、文档或纸张，全部随 `currentColor`——`classifyLinkPath` 按扩展名推导文件路径的类别。`ConnectionIndicator` 可渲染警告色的断联操作、以独立于 retry 时序的 500ms 节奏推进一至三个点的连接中状态，或成功色的恢复状态。所有状态都为最长的输入 label 预留空间，并使用固定的图标列和文字列，因此文案变化不会移动控件或改变其宽度。它的 owner 提供可见性、恢复驻留时间、本地化 label 与立即重连回调；该原语不使用原生 title tooltip。`useAnchoredPosition` 与 `useAnchoredMaxHeight` 让浮动面板与底部锚定浮层始终钳制在视口内并跟随锚点。`HoverCard` 通过指针离开宽限期让采用 portal 的预览在跨过锚点间隙时仍可触及，并可通过 `copyText` prop 提供复制按钮。 `Toast` 的停留时长由使用方通过 `holdMs` 指定，因为横幅该留多久取决于有多少内容要读；同一个值同时驱动它的卸载定时器与样式表的淡出延迟，两者不可能再错位。 `rankByName` 是 `/` 菜单命令源与 skill 源共享的候选排序器：查询必须是名字的不区分大小写的有序子序列；前缀命中排最前，其次按对齐分数，再按来源顺序（[排名决策](../../../.agents/notes/implemented/feature/2026-08-04-web-slash-command-fuzzy-discovery.zh.md)）。
 
 ### 渲染 agent 输出
 
@@ -104,7 +104,7 @@ kind: "package-library"
 
 - **流式期间跨边界引用解析被推迟**：定义落在增量冻结边界另一侧的引用式链接或脚注，在回复流式输出期间渲染为字面文本；定稿时的全量解析会将其解析。
 - **长高亮 fence 会保留完整 token DOM**：流式路径避免重新解析、重新 tokenize 和 reconcile 已完成前缀，但不会丢弃旧颜色或虚拟化 token span。因此最终 DOM 数量仍随 fence 的 token 数增长；嵌套／容器内 fence 与病态的单个超长行仍走通用尾部路径。
-- **字形级图标是重新绘制的近似版本**：鱼形标志与闪光标记来自字体字形，而本地设计数据无法导出其矢量几何；在获得精确导出路径前，使用手工重建版本代替。
+- **字形级图标是重新绘制的近似版本**：闪光标记来自字体字形，而本地设计数据无法导出其矢量几何；在获得精确导出路径前，使用手工重建版本代替。`BrandMark`/`BrandWordmark` 标记对则取自 moreweb 网站的原始图形。
 - **`Pill` 与 `Input` 没有设计来源**：两个原子组件均自行定义；与其相似的侧边栏搜索字段和视图标签条由消费方组合，不是这些原子组件。
 - **`StateDot` 没有 `Active` 变体**：支持的状态为 done、warning、ongoing 和 error。
 - **面向用户的文案必须由渲染点提供**：这些原子组件是 zero-Cordis 的，拿不到 `ctx.locale`；各功能必须通过 primitive 的带类型 prop 提供完整本地化 label（见[决策](../../../.agents/notes/implemented/architecture/2026-08-23-locale-owned-client-ui-copy.zh.md)）。

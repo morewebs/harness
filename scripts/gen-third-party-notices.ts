@@ -406,6 +406,19 @@ export function tierExternalDeps(manifests: Map<string, Manifest>, names: Set<st
   return tiers
 }
 
+/** A font family vendored as woff2 assets rather than an npm dependency. */
+export interface FontAssetRow {
+  family: string
+  authors: string
+  license: string
+}
+
+/** Font files shipped from `apps/web/public/fonts/` with their license texts beside them. */
+export const FONT_ASSETS: readonly FontAssetRow[] = [
+  { family: 'Poppins', authors: 'https://github.com/itfoundry/poppins', license: 'OFL-1.1' },
+  { family: 'Space Mono', authors: 'https://github.com/floriankarsten/space-mono', license: 'OFL-1.1' },
+]
+
 /** A vendored package row parsed out of the `vendor/README.md` manifest table. */
 export interface VendoredRow {
   npmName: string
@@ -718,6 +731,14 @@ The Cordis framework and its foundation libraries are source-vendored into this 
 | Package | Upstream name | Upstream | License |
 | --- | --- | --- | --- |
 ${vendored.map(row => `| \`${row.npmName}\` | \`${row.upstreamName}\` | [${row.upstream.replace('https://', '')}](${row.upstream}) | MIT |`).join('\n')}
+
+## Vendored font assets
+
+Font binaries served by the Web client under the moreweb brand are vendored into [\`apps/web/public/fonts/\`](apps/web/public/fonts/) rather than consumed as npm packages; each family is licensed under the SIL Open Font License 1.1 and the license text ships beside the font files.
+
+| Font | Upstream | License |
+| --- | --- | --- |
+${FONT_ASSETS.map(font => `| \`${font.family}\` | [${font.authors.replace('https://', '')}](${font.authors}) | ${font.license} |`).join('\n')}
 
 ## Runtime npm dependencies
 

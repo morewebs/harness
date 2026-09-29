@@ -147,11 +147,14 @@ describe('web e2e: a finished turn ends with the files it produced', () => {
     await expect.poll(() => row.getByText('+ 4 files', { exact: true }).isVisible()).toBe(true)
 
     await page.setViewportSize({ width: 780, height: 900 })
-    await expect.poll(() => chips.count()).toBe(5)
+    // The visible-chip count is the brand typography's metric (Poppins runs
+    // slightly wider than the old system stack), so pin the collapse BEHAVIOR:
+    // the first chips stay, the tail folds into a larger overflow counter.
+    await expect.poll(() => chips.count()).toBe(4)
     expect(await chips.nth(0).innerText()).toBe('关于我.md')
     expect(await chips.nth(1).innerText()).toBe('index.html')
-    expect(await chips.nth(4).innerText()).toBe('app.ts')
-    await expect.poll(() => row.getByText('+ 5 files', { exact: true }).isVisible()).toBe(true)
+    expect(await chips.filter({ hasText: 'app.ts' }).count()).toBe(0)
+    await expect.poll(() => row.getByText('+ 6 files', { exact: true }).isVisible()).toBe(true)
     const showFolder = page.getByRole('button', { name: 'Show in folder', exact: true })
     expect(await showFolder.count()).toBe(1)
     expect(await page.getByText('Produced', { exact: true }).count()).toBe(1)

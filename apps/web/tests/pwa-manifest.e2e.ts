@@ -26,10 +26,11 @@ it('ships install metadata with the built web application', async () => {
   })
 })
 
-it('ships a favicon that switches to a light mark under dark color scheme', async () => {
+it('ships the moreweb mark favicon that reads on any color scheme', async () => {
   const favicon = await readFile(join(DIST_ROOT, 'favicon.svg'), 'utf8')
-  // The light fill must live inside the dark-scheme media query, so the icon
-  // stays black in light mode and only turns white under a dark scheme.
-  expect(favicon).toMatch(/@media \(prefers-color-scheme: dark\)\s*{\s*path\s*{[^}]*fill:\s*#fff/i)
-  expect(favicon).toContain('fill="#000"')
+  // The mark carries its own dark tile, so no scheme variant is needed; the
+  // gradient stroke and the purple stop are the brand's fixed artwork.
+  expect(favicon).toContain('fill="#030005"')
+  expect(favicon).toContain('stop-color="#bf00ff"')
+  expect(favicon).toMatch(/stroke="url\(#/)
 })

@@ -62,7 +62,7 @@ it('boots the built plugin graph and renders a fixture session end to end', asyn
   // The sidebar renders from the boot graph: every inject layer activated.
   const tree = await screen.findByRole('tree', { name: 'Sessions' }, { timeout: 10_000 })
   if (clientBuildValue('DSH_CLIENT_BUILD_PROFILE') === 'official') {
-    expect(document.querySelector('svg[viewBox="0 0 138 24"]')).not.toBeNull()
+    expect(document.querySelector('svg[viewBox="0 0 69 24"]')).not.toBeNull()
     expect(screen.queryByText('moreweb Local Build')).toBeNull()
   } else {
     // A default local build bakes no profile value, so ui-brand-official
@@ -70,7 +70,7 @@ it('boots the built plugin graph and renders a fixture session end to end', asyn
     // 'local' profile): the wordmark renders, and with no DSH_CLIENT_TITLE
     // baked the document title falls back to the localized local-build label
     // (as the product-title suffix once a session is current).
-    expect(document.querySelector('svg[viewBox="0 0 138 24"]')).not.toBeNull()
+    expect(document.querySelector('svg[viewBox="0 0 69 24"]')).not.toBeNull()
     expect(document.title).toContain('moreweb Local Build')
   }
   // The compact layout dropped group session counts; the fixture workspace

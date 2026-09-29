@@ -70,15 +70,22 @@ export interface HeroShellProps {
   children?: ReactNode
 }
 
+/** Square edge of the hero brand mark, in px. */
+const HERO_MARK_SIZE = 40
+
 /**
- * Render the hero chrome (headline only; no composer, no workspace row).
+ * Render the hero chrome (brand mark + headline; no composer, no workspace row).
  * @param props - see {@link HeroShellProps}.
  * @returns the centered hero element tree.
  */
-export function HeroShell({ t, children }: HeroShellProps) {
+export function HeroShell({ t, renderSlot, children }: HeroShellProps) {
+  // An absent renderer or an unoccupied slot paints no wrapper, so the stack
+  // spacing collapses instead of reserving the mark's seat.
+  const mark = renderSlot?.('conversation.hero.brand.mark', { size: HERO_MARK_SIZE })
   return (
     <div className={css.root}>
       <div className={css.stack}>
+        {mark != null && <div className={css.heroMark}>{mark}</div>}
         <div className={css.headline}>
           <span className={css.headlineText}>
             {t('hero.headline')}

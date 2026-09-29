@@ -323,9 +323,8 @@
   cursor: default;
 }
 
-/* Primary send (figma IconButton 34:10465): 34px circle, #3964FE light /
-   #679EFE dark — the info-fill pair (500→400), NOT button-primary (ink);
-   white glyph; empty text = 0.4 opacity. */
+/* Primary send (figma IconButton 34:10465): 34px circle on the info-fill
+   pair, NOT button-primary (ink); white glyph; empty text = 0.4 opacity. */
 .primary {
   display: grid;
   place-items: center;
@@ -336,8 +335,8 @@
   border-radius: 999px;
   corner-shape: round;
   background: var(--dsw-alias-button-info-fill);
-  /* Static white, not the foreground token: the arrow stays white on the blue
-     fill in both themes (design 34:10465). */
+  /* Static white, not the foreground token: the arrow stays white on the
+     accent fill in both themes (design 34:10465). */
   color: #fff;
   cursor: pointer;
   transition: background-color 100ms ease;
