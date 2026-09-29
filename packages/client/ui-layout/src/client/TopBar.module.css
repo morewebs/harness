@@ -1,3 +1,7 @@
+/* Frameless desktop title bar: theme-token chrome, drag region for the
+   frameless window, Windows-convention window controls. AppFrame mounts the
+   bar only where the desktop bridge exists, so app-region always applies. */
+
 .topBar {
   grid-column: 1 / -1;
   grid-row: 1;
@@ -6,10 +10,9 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  background-color: #181818;
-  color: #cccccc;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+  background-color: var(--dsw-alias-bg-layer-2);
+  color: var(--dsw-alias-label-secondary);
+  border-bottom: 0.5px solid var(--dsw-alias-border-l2);
   -webkit-app-region: drag;
   app-region: drag;
   user-select: none;
@@ -39,14 +42,14 @@
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: #cccccc;
+  color: var(--dsw-alias-label-secondary);
   cursor: pointer;
   transition: background-color 100ms ease, color 100ms ease;
 }
 
 .iconBtn:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
+  background-color: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-primary);
 }
 
 .iconBtn:disabled {
@@ -69,8 +72,7 @@
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: #cccccc;
-  font-family: inherit;
+  color: var(--dsw-alias-label-secondary);
   font-size: 12px;
   font-weight: 400;
   line-height: 18px;
@@ -79,8 +81,8 @@
 }
 
 .menuBtn:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
+  background-color: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-primary);
 }
 
 .dragSpacer {
@@ -107,23 +109,25 @@
   height: 100%;
   border: none;
   background: transparent;
-  color: #cccccc;
+  color: var(--dsw-alias-label-secondary);
   cursor: pointer;
   transition: background-color 80ms ease, color 80ms ease;
   -webkit-app-region: no-drag;
 }
 
 .controlBtn:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
+  background-color: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-primary);
 }
 
+/* Static white, not a label token: the Windows close convention keeps a
+   white glyph on the error fill in both themes (send-button precedent). */
 .closeBtn:hover {
-  background-color: #e81123 !important;
-  color: #ffffff !important;
+  background-color: var(--dsw-alias-state-error-primary);
+  color: #fff;
 }
 
 .closeBtn:active {
-  background-color: #c40e1d !important;
-  color: #ffffff !important;
+  background-color: var(--dsw-alias-state-error-primary);
+  color: #fff;
 }

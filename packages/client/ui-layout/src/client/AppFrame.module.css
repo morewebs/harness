@@ -56,10 +56,11 @@
 
 /* Drag handles are frame children (columns clip overflow): an 8px hit strip
    centered on the column border via inline left, above column content. Details
-   adds a visible 12x32 pill at vertical center; sidebar keeps only the hit strip. */
+   adds a visible 12x32 pill at vertical center; sidebar keeps only the hit strip.
+   The strip starts below the title bar where the desktop bridge mounts it. */
 .handle {
   position: absolute;
-  top: 35px;
+  top: 0;
   bottom: 0;
   width: 8px;
   margin-left: -4px;
@@ -69,6 +70,10 @@
   /* Rides the same curve as the tracks so the pill stays on the moving
      border during collapse/expand; paused while dragging (frame rule). */
   transition: left var(--ds-transition-duration-slow) var(--ds-ease-in-out);
+}
+
+.frame[data-top-bar] .handle {
+  top: 35px;
 }
 
 .frame[data-dragging] .handle {
@@ -115,9 +120,14 @@
 
 .overlayLayer {
   position: absolute;
-  inset: 35px 0 0 0;
+  inset: 0;
   z-index: 20;
   pointer-events: none;
+}
+
+/* Desktop builds keep overlays below the title bar's drag region. */
+.frame[data-top-bar] .overlayLayer {
+  inset: 35px 0 0 0;
 }
 
 .overlayLayer > * {

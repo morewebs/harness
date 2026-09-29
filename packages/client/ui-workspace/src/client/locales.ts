@@ -10,7 +10,6 @@ export const zh = {
   'session.new': '新会话',
   'section.workspaces': '工作区',
   'section.sessions': '会话',
-  'section.pinned': '置顶',
   'section.recents': '最近',
   'viewOptions.label': '视图选项',
   'groupBy.label': '分组方式',
@@ -23,7 +22,6 @@ export const zh = {
   'sessions.collapse': '收起',
   'empty.none': '暂无会话',
   'empty.noChats': '无对话',
-  'empty.noMatches': '无匹配结果',
 
 
   'workspace.add': '添加工作区',
@@ -50,8 +48,6 @@ export const zh = {
   'delete.pending': '正在删除工作区…',
   'menu.fork': '分叉会话',
   'menu.archiveSession': '归档会话',
-  'sessions.count.one': '{n} 个会话',
-  'sessions.count.other': '{n} 个会话',
   'actions.workspace.aria': '工作区“{name}”的操作',
   'actions.session.aria': '会话“{name}”的操作',
   'actions.newSession.aria': '在“{name}”中新建会话',
@@ -81,11 +77,10 @@ export type WorkspaceKey = keyof typeof zh
 
 /** English dictionary, checked complete against the zh key set. */
 export const en = {
-  'group.ungrouped': 'Recents',
+  'group.ungrouped': 'Ungrouped',
   'session.new': 'New Session',
-  'section.workspaces': 'Projects',
+  'section.workspaces': 'Workspaces',
   'section.sessions': 'Sessions',
-  'section.pinned': 'Pinned',
   'section.recents': 'Recents',
   'viewOptions.label': 'View options',
   'groupBy.label': 'Group by',
@@ -98,7 +93,6 @@ export const en = {
   'sessions.collapse': 'Show less',
   'empty.none': 'No sessions yet',
   'empty.noChats': 'No chats',
-  'empty.noMatches': 'No matches',
 
   'workspace.add': 'Add workspace',
   'search.sessions.aria': 'Search sessions',
@@ -124,8 +118,6 @@ export const en = {
   'delete.pending': 'Deleting workspace…',
   'menu.fork': 'Fork session',
   'menu.archiveSession': 'Archive session',
-  'sessions.count.one': '{n} session',
-  'sessions.count.other': '{n} sessions',
   'actions.workspace.aria': 'Workspace actions for {name}',
   'actions.session.aria': 'Session actions for {name}',
   'actions.newSession.aria': 'New session in {name}',

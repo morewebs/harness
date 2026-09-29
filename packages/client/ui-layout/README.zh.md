@@ -9,7 +9,7 @@ kind: "package-reference"
 
 ## 概述
 
-本包提供 Web GUI 的外壳布局：一个三栏 AppFrame，带可缩放的侧栏与详情面板；一条让步链，在空间不足时先收缩详情栏、随后自动关闭它；以及 `ctx.layout` 面板几何服务，供其他插件调用以打开或关闭详情栏。框架的顶栏承载桌面外壳界面框架——侧边栏开关、导航、应用菜单触发与经 `window.desktopAPI` 桥接的原生窗口控件——其文案走 `layout` locale namespace。它还承载主题呈现器，把解析后的配色方案、别名 token、正文字号与 `theme-color` 元数据投影到 document。需要标准窗口外观时选择它；面板几何是瞬时的，重新加载即重置。
+本包提供 Web GUI 的外壳布局：一个三栏 AppFrame，带可缩放的侧栏与详情面板；一条让步链，在空间不足时先收缩详情栏、随后自动关闭它；以及 `ctx.layout` 面板几何服务，供其他插件调用以打开或关闭详情栏。框架的顶栏承载桌面外壳界面框架——侧边栏开关、导航、应用菜单触发与经 `window.desktopAPI` 桥接的原生窗口控件——仅在该桥接存在时挂载，其文案走 `layout` locale namespace。它还承载主题呈现器，把解析后的配色方案、别名 token、正文字号与 `theme-color` 元数据投影到 document。需要标准窗口外观时选择它；面板几何是瞬时的，重新加载即重置。
 
 ## 目录
 
@@ -29,7 +29,7 @@ kind: "package-reference"
 
 ### 顶栏
 
-顶栏是无边框桌面窗口的外壳界面框架：它既是窗口拖动区域，其控件也经 Electron preload 的 `window.desktopAPI` 桥接——侧边栏开关与前进/后退导航、File/Edit/View/Help 菜单触发，以及原生最小化/最大化/关闭按钮。没有该桥接时（普通浏览器页面），前进/后退回退到浏览器历史，菜单触发与窗口控件则无动作。文案由 `layout` namespace 的 `topbar.*` 键持有，并经标准 translate seat 跟随当前语言。
+顶栏是无边框桌面窗口的外壳界面框架：它既是窗口拖动区域，其控件也经 Electron preload 的 `window.desktopAPI` 桥接——侧边栏开关与前进/后退导航、File/Edit/View/Help 菜单触发，以及原生最小化/最大化/关闭按钮。AppFrame 仅在该桥接存在时挂载顶栏，因此普通浏览器页面不会携带无动作的菜单与窗口控件。文案由 `layout` namespace 的 `topbar.*` 键持有，并经标准 translate seat 跟随当前语言。
 
 ### 主题呈现
 

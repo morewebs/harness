@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-This package provides the shell layout of the Web GUI: a three-column AppFrame with resizable sidebar and details panels, a concession chain that shrinks the details column and then auto-closes it when space runs out, and the `ctx.layout` panel-geometry service other plugins call to open or close the details column. The frame's top bar carries the desktop shell chrome — sidebar toggle, navigation, app-menu triggers, and native window controls bridged through `window.desktopAPI` — and its copy rides the `layout` locale namespace. The package also seats the theme presenter, which projects the resolved color scheme, alias tokens, content font size, and `theme-color` metadata onto the document. Choose it for the standard window chrome; panel geometry is transient and resets on reload.
+This package provides the shell layout of the Web GUI: a three-column AppFrame with resizable sidebar and details panels, a concession chain that shrinks the details column and then auto-closes it when space runs out, and the `ctx.layout` panel-geometry service other plugins call to open or close the details column. The frame's top bar carries the desktop shell chrome — sidebar toggle, navigation, app-menu triggers, and native window controls bridged through `window.desktopAPI` — mounted only where that bridge exists, with its copy riding the `layout` locale namespace. The package also seats the theme presenter, which projects the resolved color scheme, alias tokens, content font size, and `theme-color` metadata onto the document. Choose it for the standard window chrome; panel geometry is transient and resets on reload.
 
 ## Table of Contents
 
@@ -29,7 +29,7 @@ Mount this plugin at the root slot; it then renders the app frame around whateve
 
 ### The top bar
 
-The top bar is the desktop shell's chrome in a frameless window: it is the window's drag region, and its controls bridge to the Electron preload's `window.desktopAPI` — the sidebar toggle and back/forward navigation, the File/Edit/View/Help menu triggers, and the native minimize/maximize/close buttons. Without the bridge (a plain browser page), back and forward fall back to browser history while the menu triggers and window controls perform no action. Copy is locale-owned (`topbar.*` keys of the `layout` namespace) and follows the active locale through the standard translate seat.
+The top bar is the desktop shell's chrome in a frameless window: it is the window's drag region, and its controls bridge to the Electron preload's `window.desktopAPI` — the sidebar toggle and back/forward navigation, the File/Edit/View/Help menu triggers, and the native minimize/maximize/close buttons. AppFrame mounts it only where that bridge exists, so a plain browser page carries no inert menus or window controls. Copy is locale-owned (`topbar.*` keys of the `layout` namespace) and follows the active locale through the standard translate seat.
 
 ### Theme presentation
 

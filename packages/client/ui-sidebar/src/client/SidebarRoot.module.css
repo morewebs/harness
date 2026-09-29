@@ -113,37 +113,11 @@
   gap: 4px;
 }
 
-.brandChevron {
-  flex: none;
-  color: var(--dsw-alias-label-tertiary);
-}
-
 .headerTrailingActions {
   flex: none;
   display: inline-flex;
   align-items: center;
   gap: 2px;
-}
-
-.headerActionButton {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 6px;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-  color: var(--dsw-alias-label-secondary);
-  transition: background-color 120ms ease, color 120ms ease;
-}
-
-.headerActionButton:hover {
-  background: var(--dsw-alias-interactive-bg-hover);
-  color: var(--dsw-alias-label-primary);
 }
 
 

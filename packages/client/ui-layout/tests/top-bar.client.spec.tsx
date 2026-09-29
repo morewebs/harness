@@ -29,19 +29,22 @@ describe('TopBar', () => {
     expect(getByLabelText('Open Primary Side Bar')).toBeDefined()
   })
 
-  it('renders navigation buttons and triggers history fallback in browser mode', () => {
-    const backSpy = vi.spyOn(window.history, 'back').mockImplementation(() => {})
-    const fwdSpy = vi.spyOn(window.history, 'forward').mockImplementation(() => {})
+  it('renders navigation buttons disabled until the bridge reports history', async () => {
+    window.desktopAPI = {
+      isDesktop: true,
+      isMaximized: vi.fn().mockResolvedValue(false),
+      canGoBack: vi.fn().mockResolvedValue(false),
+      canGoForward: vi.fn().mockResolvedValue(false),
+      onMaximizedChange: () => () => {},
+      onNavStateChange: () => () => {},
+    }
 
     const { getByLabelText } = render(<TopBar t={t} onToggleSidebar={() => {}} />)
-    fireEvent.click(getByLabelText('Back'))
-    expect(backSpy).toHaveBeenCalledTimes(1)
-
-    fireEvent.click(getByLabelText('Forward'))
-    expect(fwdSpy).toHaveBeenCalledTimes(1)
-
-    // Window controls are rendered on the far right
-    expect(getByLabelText('Window Controls')).toBeDefined()
+    await act(async () => {
+      await Promise.resolve()
+    })
+    expect((getByLabelText('Back') as HTMLButtonElement).disabled).toBe(true)
+    expect((getByLabelText('Forward') as HTMLButtonElement).disabled).toBe(true)
   })
 
   it('renders window controls and delegates to desktopAPI in desktop mode', async () => {

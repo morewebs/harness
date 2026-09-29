@@ -172,6 +172,10 @@ export function AppFrame({
     actions.setDetails(detailsBase.current - dx)
   }, [actions])
   const productTitle = process.env.DSH_CLIENT_TITLE ?? t('brand.localBuild')
+  // The title bar is desktop-window chrome: it mounts only where the preload
+  // bridge exists, so the browser surface never carries inert menus or
+  // window controls.
+  const topBar = Boolean(window.desktopAPI?.isDesktop)
 
   return (
     <div
@@ -181,16 +185,19 @@ export function AppFrame({
       data-sidebar-collapsed={sidebarCollapsed || undefined}
       data-details-collapsed={cols.details === 0 || undefined}
       data-dragging={dragging || undefined}
+      data-top-bar={topBar || undefined}
     >
       <DocumentTitle
         productTitle={productTitle}
         {...documentTitle === undefined ? {} : { title: documentTitle }}
       />
-      <TopBar
-        t={t}
-        onToggleSidebar={() => { actions.toggleSidebar() }}
-        sidebarCollapsed={sidebarCollapsed}
-      />
+      {topBar && (
+        <TopBar
+          t={t}
+          onToggleSidebar={() => { actions.toggleSidebar() }}
+          sidebarCollapsed={sidebarCollapsed}
+        />
+      )}
       <div className={css.sidebarCol}>
         {/* Render-site slot call with live concession output: a closed
             sidebar keeps the mounted slot at the compact-rail width, and the

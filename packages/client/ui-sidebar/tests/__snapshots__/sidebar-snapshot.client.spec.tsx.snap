@@ -146,15 +146,6 @@ exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsul
                       moreweb
                     </span>
                      Local Build
-                    <svg
-                      class="brandChevron"
-                      data-content="6506c885"
-                      fill="none"
-                      height="13"
-                      viewBox="0 0 14 14"
-                      width="13"
-                      xmlns="http://www.w3.org/2000/svg"
-                    />
                   </span>
                 </span>
                 <span
@@ -170,20 +161,6 @@ exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsul
       <div
         class="headerTrailingActions"
       >
-        <button
-          aria-label="Search"
-          class="headerActionButton"
-          type="button"
-        >
-          <svg
-            data-content="4ca56c6d"
-            fill="none"
-            height="15"
-            viewBox="0 0 16 16"
-            width="15"
-            xmlns="http://www.w3.org/2000/svg"
-          />
-        </button>
         <button
           aria-label="Collapse sidebar"
           class="iconButton toggle"
@@ -364,15 +341,6 @@ exports[`sidebar shell snapshots > renders the expanded column in the default lo
                       moreweb
                     </span>
                      本地构建
-                    <svg
-                      class="brandChevron"
-                      data-content="6506c885"
-                      fill="none"
-                      height="13"
-                      viewBox="0 0 14 14"
-                      width="13"
-                      xmlns="http://www.w3.org/2000/svg"
-                    />
                   </span>
                 </span>
                 <span
@@ -388,20 +356,6 @@ exports[`sidebar shell snapshots > renders the expanded column in the default lo
       <div
         class="headerTrailingActions"
       >
-        <button
-          aria-label="搜索"
-          class="headerActionButton"
-          type="button"
-        >
-          <svg
-            data-content="4ca56c6d"
-            fill="none"
-            height="15"
-            viewBox="0 0 16 16"
-            width="15"
-            xmlns="http://www.w3.org/2000/svg"
-          />
-        </button>
         <button
           aria-label="收起侧边栏"
           class="iconButton toggle"

@@ -17,8 +17,8 @@
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
-  IconChevronDownOutline14, IconCordisPluginOutline14, IconEditOutline16,
-  IconPanelLeftOutline16, IconSearchOutline16, IconSparkle16, Tooltip,
+  IconCordisPluginOutline14, IconEditOutline16,
+  IconPanelLeftOutline16, IconSparkle16, Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 
 function IconPlusCircleOutline14({ size = 14, className }: { size?: number; className?: string | undefined }) {
@@ -185,7 +185,6 @@ export function SidebarRoot({
                       <span className={css.fallbackBrandName}>
                         <span className={css.brandTitleWrap}>
                           {formatBrandText(t('brand.localBuild'))}
-                          <IconChevronDownOutline14 className={css.brandChevron} size={13} />
                         </span>
                       </span>
                     )
@@ -194,7 +193,6 @@ export function SidebarRoot({
                         <span className={css.localBuildTitle}>
                           <span className={css.brandTitleWrap}>
                             {formatBrandText(t('brand.localBuild'))}
-                            <IconChevronDownOutline14 className={css.brandChevron} size={13} />
                           </span>
                         </span>
                         <span className={css.buildVersion}>{buildVersion}</span>
@@ -206,26 +204,6 @@ export function SidebarRoot({
           </button>
         )}
         <div className={css.headerTrailingActions}>
-          {wide && (
-            <Tooltip label={t('search')} delayMs={500}>
-              <button
-                type="button"
-                className={css.headerActionButton}
-                aria-label={t('search')}
-                onClick={() => {
-                  const searchInput = column.current?.querySelector<HTMLInputElement>('input[placeholder*="Search"], input[placeholder*="搜索"]')
-                  if (searchInput) {
-                    searchInput.focus()
-                  } else {
-                    const searchBtn = column.current?.querySelector<HTMLButtonElement>('button[aria-label*="Search"], button[aria-label*="搜索"]')
-                    searchBtn?.click()
-                  }
-                }}
-              >
-                <IconSearchOutline16 size={15} />
-              </button>
-            </Tooltip>
-          )}
           {/* Rail resting state is the brand mark or panel toggle icon. */}
           <Tooltip label={collapsed ? t('toggle.open') : t('toggle.collapse')} delayMs={500}>
             <button

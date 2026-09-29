@@ -1,6 +1,8 @@
 /**
- * TopBar: Frameless modern native desktop window title bar.
- * Structured as a single-row flex container with space between left and right:
+ * TopBar: Frameless modern native desktop window title bar. AppFrame mounts
+ * it only where the desktop bridge exists, so every control below has a real
+ * bridge behind it. Structured as a single-row flex container with space
+ * between left and right:
  * - Far left: compact icon and navigation cluster (sidebar toggle icon, left-arrow,
  *   right-arrow) followed immediately by standard menu items ("File", "Edit", "View", "Help")
  *   with ~16px horizontal spacing and subtle light-gray hover states.
@@ -94,10 +96,9 @@ export function TopBar({ t, onToggleSidebar, sidebarCollapsed = false }: TopBarP
   const [isMaximized, setIsMaximized] = useState(false)
   const [canGoBack, setCanGoBack] = useState(false)
   const [canGoForward, setCanGoForward] = useState(false)
-  const isDesktop = typeof window !== 'undefined' && Boolean(window.desktopAPI?.isDesktop)
 
   useEffect(() => {
-    if (!isDesktop || !window.desktopAPI) return
+    if (!window.desktopAPI) return
 
     // Query initial maximized state
     void window.desktopAPI.isMaximized?.().then((max) => {
@@ -127,29 +128,19 @@ export function TopBar({ t, onToggleSidebar, sidebarCollapsed = false }: TopBarP
       offMax?.()
       offNav?.()
     }
-  }, [isDesktop])
+  }, [])
 
   const handleGoBack = (): void => {
-    if (window.desktopAPI?.goBack) {
-      void window.desktopAPI.goBack()
-    } else if (typeof window !== 'undefined') {
-      window.history.back()
-    }
+    void window.desktopAPI?.goBack?.()
   }
 
   const handleGoForward = (): void => {
-    if (window.desktopAPI?.goForward) {
-      void window.desktopAPI.goForward()
-    } else if (typeof window !== 'undefined') {
-      window.history.forward()
-    }
+    void window.desktopAPI?.goForward?.()
   }
 
   const handleMenuClick = (e: MouseEvent<HTMLButtonElement>, menuName: string): void => {
     const rect = e.currentTarget.getBoundingClientRect()
-    if (window.desktopAPI?.popupMenu) {
-      void window.desktopAPI.popupMenu(menuName, rect.left, rect.bottom)
-    }
+    void window.desktopAPI?.popupMenu?.(menuName, rect.left, rect.bottom)
   }
 
   const handleMinimize = (): void => {
@@ -182,7 +173,7 @@ export function TopBar({ t, onToggleSidebar, sidebarCollapsed = false }: TopBarP
           className={css.iconBtn}
           title={t('topbar.back')}
           aria-label={t('topbar.back')}
-          disabled={isDesktop && !canGoBack}
+          disabled={!canGoBack}
           onClick={handleGoBack}
         >
           <IconArrowLeft />
@@ -193,7 +184,7 @@ export function TopBar({ t, onToggleSidebar, sidebarCollapsed = false }: TopBarP
           className={css.iconBtn}
           title={t('topbar.forward')}
           aria-label={t('topbar.forward')}
-          disabled={isDesktop && !canGoForward}
+          disabled={!canGoForward}
           onClick={handleGoForward}
         >
           <IconArrowRight />
