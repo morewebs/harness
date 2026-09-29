@@ -13,6 +13,9 @@
     - button "Agent presets":
       - img
       - text: Agent presets
+    - button "Plugin Market":
+      - img
+      - text: Plugin Market
   - button "Open configuration file"
   - button "Close":
     - img

@@ -1359,8 +1359,11 @@ const ARIA_AGE =
 
 function normalizeAria(snapshot: string, workspaceCwd: string, age: boolean): string {
   // The session heading renders the workspace's basename, not the full
-  // path, so both spellings must collapse to the token.
-  const base = workspaceCwd.split('/').pop()!
+  // path, so both spellings must collapse to the token. Both separators:
+  // a Windows workspaceCwd carries backslashes, and a '/'-only split would
+  // leave the whole path as the "basename", baking run-specific names
+  // into refreshed goldens.
+  const base = workspaceCwd.split(/[\\/]/).pop()!
   return (age ? snapshot.replace(ARIA_AGE, '{{age}}') : snapshot)
     .split(workspaceCwd).join('{{cwd}}')
     .split(base).join('{{workspace}}')

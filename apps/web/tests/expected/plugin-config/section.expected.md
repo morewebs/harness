@@ -13,6 +13,9 @@
     - button "Agent 预设":
       - img
       - text: Agent 预设
+    - button "插件市场":
+      - img
+      - text: 插件市场
   - button "打开配置文件"
   - button "关闭":
     - img
@@ -24,6 +27,9 @@
     - tab "插件列表"
   - tabpanel "插件配置":
     - list:
+      - button "插件市场 查看插件市场版本与设置。":
+        - text: 插件市场 查看插件市场版本与设置。
+        - img
       - listitem:
         - 'button "展开设置: 终端"':
           - text: 终端 限制 agent 运行的每一条命令。
