@@ -9,10 +9,7 @@ export interface DesktopBridge {
   isDesktop: true
   platform: NodeJS.Platform
   restartServer: () => Promise<void>
-  openHomeFolder: () => Promise<void>
   openLogFolder: () => Promise<void>
-  openExternal: (url: string) => Promise<void>
-  getVersion: () => Promise<string>
   onServerStatus: (callback: (status: { state: string; message?: string }) => void) => () => void
   minimize: () => Promise<void>
   maximize: () => Promise<boolean>
@@ -31,10 +28,7 @@ const desktopBridge: DesktopBridge = {
   isDesktop: true,
   platform: process.platform,
   restartServer: () => ipcRenderer.invoke('dsh:restart-server'),
-  openHomeFolder: () => ipcRenderer.invoke('dsh:open-home-folder'),
   openLogFolder: () => ipcRenderer.invoke('dsh:open-log-folder'),
-  openExternal: (url: string) => ipcRenderer.invoke('dsh:open-external', url),
-  getVersion: () => ipcRenderer.invoke('dsh:get-version'),
   minimize: () => ipcRenderer.invoke('dsh:window-minimize'),
   maximize: () => ipcRenderer.invoke('dsh:window-maximize'),
   close: () => ipcRenderer.invoke('dsh:window-close'),

@@ -88,7 +88,7 @@ pnpm --filter @deepseek-ai/dsh-desktop run pack
    - 替换 `apps/desktop/build/icon.png`（512x512 PNG）与 `apps/desktop/build/icon.ico`（多分辨率 ICO）。
    - 或修改 `scripts/generate-desktop-icons.py` 后运行 `python scripts/generate-desktop-icons.py`。
 4. **自定义启动画面**：
-   - 定制 `apps/desktop/src/renderer/loading.html` 与 `loading.css`。
+   - 定制 `apps/desktop/src/renderer/loading.html`（样式内联于该文件）。
 
 ## 环境变量
 
@@ -97,4 +97,5 @@ pnpm --filter @deepseek-ai/dsh-desktop run pack
 | `DSH_DESKTOP_SERVER_URL` | 跳过本地服务器启动，连接既有服务器（例如 `http://127.0.0.1:8080`） |
 | `DSH_BIN_PATH` | 显式指定 `dsh` 可执行文件或脚本的路径 |
 | `DSH_HOME` | 覆盖用户数据根目录（默认 `~/.dsh`） |
-| `DSH_TELEMETRY_DISABLED` | 设为 `1` 以禁用遥测 |
+| `DSH_TELEMETRY_DISABLED` | 遥测默认关闭；设为 `0` 以启用 |
+| `DSH_DESKTOP_START_TIMEOUT_MS` | 后端启动超时预算（默认 90000） |

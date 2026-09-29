@@ -5,7 +5,6 @@
 import { app, BrowserWindow, shell, ipcMain, Menu } from 'electron'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { homedir } from 'node:os'
 import { existsSync } from 'node:fs'
 import { ServerManager } from './server-manager.js'
 import { buildApplicationMenu } from './menu.js'
@@ -13,7 +12,7 @@ import { buildApplicationMenu } from './menu.js'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-/** Delay before navigating to the backend URL, so the splash blur-out in loading.css can play. */
+/** Delay before navigating to the backend URL, so the splash blur-out can play. */
 const SPLASH_EXIT_MS = 400
 
 let mainWindow: BrowserWindow | null = null
@@ -164,23 +163,15 @@ function setupIpc(): void {
     }
   })
 
-  ipcMain.handle('dsh:open-home-folder', () => {
-    const home = process.env.DSH_HOME || join(homedir(), '.dsh')
-    return shell.openPath(home)
-  })
-
   ipcMain.handle('dsh:open-log-folder', () => {
     if (serverManager) {
-      shell.showItemInFolder(serverManager.getLogFilePath())
+      // External-server boots write no log; land on the directory logs live in.
+      if (serverManager.hasLogFile()) {
+        shell.showItemInFolder(serverManager.getLogFilePath())
+      } else {
+        void shell.openPath(dirname(serverManager.getLogFilePath()))
+      }
     }
-  })
-
-  ipcMain.handle('dsh:open-external', (_event, url: string) => {
-    return shell.openExternal(url)
-  })
-
-  ipcMain.handle('dsh:get-version', () => {
-    return app.getVersion()
   })
 
   ipcMain.handle('dsh:window-minimize', () => {

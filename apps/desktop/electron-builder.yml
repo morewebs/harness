@@ -33,10 +33,6 @@ extraResources:
     to: bin
     filter:
       - '**/*'
-  - from: ../web/dist
-    to: web-dist
-    filter:
-      - '**/*'
 
 win:
   target:

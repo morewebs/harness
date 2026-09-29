@@ -12,6 +12,10 @@ import { app } from 'electron'
 /** Regular expression to extract the authenticated token URL printed by `dsh web`. */
 export const DSH_WEB_URL_REGEX = /dsh web:\s*(https?:\/\/[^\s]+)/i
 
+/** Default boot budget before the manager gives up with the collected stderr
+ * tail; DSH_DESKTOP_START_TIMEOUT_MS overrides it per boot. */
+export const DEFAULT_START_TIMEOUT_MS = 90_000
+
 export type ServerState = 'idle' | 'starting' | 'running' | 'error' | 'stopped'
 
 export interface ServerStatus {
@@ -27,6 +31,7 @@ export class ServerManager {
   private logStream: WriteStream | null = null
   private statusListeners = new Set<(status: ServerStatus) => void>()
   private logFilePath: string
+  private startPromise: Promise<string> | null = null
 
   constructor() {
     const logDir = join(app.getPath('userData'), 'logs')
@@ -38,6 +43,11 @@ export class ServerManager {
 
   getLogFilePath(): string {
     return this.logFilePath
+  }
+
+  /** A log exists only once a backend child has been spawned (external-server mode never writes one). */
+  hasLogFile(): boolean {
+    return existsSync(this.logFilePath)
   }
 
   getStatus(): ServerStatus {
@@ -213,11 +223,19 @@ export class ServerManager {
 
   /**
    * Start the DSH web backend and resolve once the authenticated URL is printed.
+   * A concurrent call while a boot is in flight joins that boot instead of
+   * spawning a second backend.
    */
   async start(): Promise<string> {
     // Check if an external server URL was provided
     if (process.env.DSH_DESKTOP_SERVER_URL) {
       const url = process.env.DSH_DESKTOP_SERVER_URL
+      const scheme = (() => { try { return new URL(url).protocol } catch { return null } })()
+      if (scheme !== 'http:' && scheme !== 'https:') {
+        const message = `DSH_DESKTOP_SERVER_URL must be an http(s) URL, got: ${url}`
+        this.notify({ state: 'error', message })
+        throw new Error(message)
+      }
       this.notify({ state: 'running', url, message: 'Connected to external server URL' })
       return url
     }
@@ -225,6 +243,7 @@ export class ServerManager {
     if (this.child && !this.child.killed) {
       if (this.authenticatedUrl) return this.authenticatedUrl
     }
+    if (this.startPromise) return this.startPromise
 
     this.notify({ state: 'starting', message: 'Locating and launching harness backend...' })
 
@@ -239,9 +258,16 @@ export class ServerManager {
 
     this.log(`[Desktop] Spawning: ${command} ${spawnArgs.join(' ')}\n`)
 
-    return new Promise<string>((resolveUrl, reject) => {
+    const boot = new Promise<string>((resolveUrl, reject) => {
       let resolved = false
       let stderrBuffer = ''
+
+      const fail = (reason: string): void => {
+        if (resolved) return
+        resolved = true
+        this.notify({ state: 'error', message: reason })
+        reject(new Error(reason))
+      }
 
       try {
         const workspaceCwd = process.env.DSH_WORKSPACE || homedir()
@@ -249,14 +275,24 @@ export class ServerManager {
           cwd: workspaceCwd,
           env: {
             ...env,
-            // Ensure CI telemetry disabled flag is respected if set
-            DSH_TELEMETRY_DISABLED: process.env.DSH_TELEMETRY_DISABLED ?? '0',
+            // Telemetry stays off unless the user opts in.
+            DSH_TELEMETRY_DISABLED: process.env.DSH_TELEMETRY_DISABLED ?? '1',
           },
           stdio: ['ignore', 'pipe', 'pipe'],
           windowsHide: true,
         })
 
         this.child = child
+
+        const timeoutMs = Number(process.env.DSH_DESKTOP_START_TIMEOUT_MS) || DEFAULT_START_TIMEOUT_MS
+        const timeout = setTimeout(() => {
+          const tail = stderrBuffer.trim().slice(-2000)
+          this.log(`[TIMEOUT] Backend did not print its URL within ${timeoutMs}ms\n`)
+          fail(`Backend did not start within ${Math.round(timeoutMs / 1000)}s${tail === '' ? '' : `: ${tail}`}`)
+          // Tear the hung boot down so the next start() is not blocked by a
+          // half-alive child that never printed its URL.
+          void this.stop()
+        }, timeoutMs)
 
         child.stdout.on('data', (chunk: Buffer | string) => {
           const text = chunk.toString('utf8')
@@ -266,6 +302,7 @@ export class ServerManager {
             const match = DSH_WEB_URL_REGEX.exec(text)
             if (match?.[1]) {
               resolved = true
+              clearTimeout(timeout)
               const url = match[1]
               this.authenticatedUrl = url
               this.notify({ state: 'running', url, message: 'Backend online' })
@@ -282,21 +319,17 @@ export class ServerManager {
 
         child.on('error', (err: Error) => {
           this.log(`[ERROR] Process failed to spawn: ${err.message}\n`)
-          this.notify({ state: 'error', message: err.message })
-          if (!resolved) {
-            resolved = true
-            reject(new Error(`Failed to start moreweb harness backend: ${err.message}`))
-          }
+          clearTimeout(timeout)
+          fail(`Failed to start moreweb harness backend: ${err.message}`)
         })
 
         child.on('exit', (code: number | null, signal: string | null) => {
           this.log(`[EXIT] Process exited with code ${String(code)} and signal ${String(signal)}\n`)
           this.child = null
           if (!resolved) {
-            resolved = true
+            clearTimeout(timeout)
             const reason = stderrBuffer.trim() || `Exited prematurely with code ${String(code)}`
-            this.notify({ state: 'error', message: reason })
-            reject(new Error(reason))
+            fail(reason)
           } else {
             this.notify({ state: 'stopped', message: `Server stopped (code: ${String(code)})` })
           }
@@ -307,6 +340,13 @@ export class ServerManager {
         reject(errorObj)
       }
     })
+
+    this.startPromise = boot
+    try {
+      return await boot
+    } finally {
+      this.startPromise = null
+    }
   }
 
   private log(message: string): void {

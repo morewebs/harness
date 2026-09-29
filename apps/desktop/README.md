@@ -87,7 +87,7 @@ If customizing this fork for your own organization:
    - Replace `apps/desktop/build/icon.png` (512x512 PNG) and `apps/desktop/build/icon.ico` (multi-resolution ICO).
    - Or modify `scripts/generate-desktop-icons.py` and run `python scripts/generate-desktop-icons.py`.
 4. **Custom Splash Screen**:
-   - Customize `apps/desktop/src/renderer/loading.html` and `loading.css`.
+   - Customize `apps/desktop/src/renderer/loading.html` (styles are inline).
 
 ## Environment Variables
 
@@ -96,4 +96,5 @@ If customizing this fork for your own organization:
 | `DSH_DESKTOP_SERVER_URL` | Skip spawning a local server and connect to an existing server (e.g., `http://127.0.0.1:8080`) |
 | `DSH_BIN_PATH` | Explicit path to a `dsh` executable or script |
 | `DSH_HOME` | Override user data root directory (defaults to `~/.dsh`) |
-| `DSH_TELEMETRY_DISABLED` | Set to `1` to disable telemetry |
+| `DSH_TELEMETRY_DISABLED` | Telemetry defaults to disabled; set to `0` to enable it |
+| `DSH_DESKTOP_START_TIMEOUT_MS` | Boot budget before the backend is declared hung (default 90000) |

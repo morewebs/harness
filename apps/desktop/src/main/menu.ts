@@ -4,7 +4,7 @@
 
 import { Menu, MenuItemConstructorOptions, app, shell, dialog, BrowserWindow } from 'electron'
 import { homedir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import type { ServerManager } from './server-manager.js'
 
 export function buildApplicationMenu(
@@ -45,13 +45,19 @@ export function buildApplicationMenu(
         {
           label: 'Open &Logs Directory',
           click: () => {
-            shell.showItemInFolder(serverManager.getLogFilePath())
+            // External-server boots write no log; land on the directory logs live in.
+            if (serverManager.hasLogFile()) {
+              shell.showItemInFolder(serverManager.getLogFilePath())
+            } else {
+              void shell.openPath(dirname(serverManager.getLogFilePath()))
+            }
           },
         },
         { type: 'separator' },
         {
           label: '&Restart Server',
-          accelerator: 'CmdOrCtrl+Shift+R',
+          // Alt, not Shift: CmdOrCtrl+Shift+R is the View menu's forceReload.
+          accelerator: 'CmdOrCtrl+Alt+R',
           click: onRestart,
         },
         { type: 'separator' },
